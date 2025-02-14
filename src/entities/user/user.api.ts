@@ -11,10 +11,10 @@ import {
 } from './user.types';
 import $api from '~shared/api';
 
-const API = 'https://api.makalabox.com/api/users';
+const API = 'https://milcase.makalabox.com/api';
 
 export function getTokenMutation(params: { user: LoginUserDto }) {
-  return $api.post<TokensDtoSchema>('jwt/create/', params.user);
+  return axios.post<TokensDtoSchema>(`${API}/jwt/create/`, params.user);
 }
 
 export function loginUserQuery() {
@@ -22,11 +22,11 @@ export function loginUserQuery() {
 }
 
 export function registerUserMutation(params: { user: CreateUserSchema }) {
-  return $api.post('users/', params.user);
+  return axios.post(`${API}/auth/users/`, params.user);
 }
 
 export function emailActivationMutation(params: { data: ActivationData }) {
-  return $api.post('users/activation/', params.data);
+  return $api.post('auth/users/activation/', params.data);
 }
 
 export function editUserProfile(params: { user: EditUserProfile }) {
@@ -43,8 +43,4 @@ export function resetPasswordEmail(params: { email: SendEmail }) {
 
 export function resetPasswordConfirm(params: { data: UpdatePassword }) {
   return axios.post(`${API}/reset_password_confirm/`, params.data);
-}
-
-export function getPerfomanceChart() {
-  return $api.get('perfomance-chart/me');
 }

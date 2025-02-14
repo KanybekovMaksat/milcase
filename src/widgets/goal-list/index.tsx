@@ -1,1 +1,0 @@
-export {GoalList} from "./goal-list.tsx";

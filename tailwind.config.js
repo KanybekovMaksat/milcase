@@ -19,6 +19,8 @@ export default {
       tundora: ' #4c4c4c',
       white: 'white',
       black: 'black',
+      violet: '#8f95cd',
+      milk: '#fe98c8',
     },
     extend: {},
   },

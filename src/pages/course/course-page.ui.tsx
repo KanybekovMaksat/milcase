@@ -1,6 +1,6 @@
 import { Title } from '~shared/ui/title';
-import { Paper, Typography, Box, Grid, Divider, Link } from '@mui/material';
-import { Table } from '~widgets/table';
+import { Paper, Typography, Box, Grid, Divider, } from '@mui/material';
+
 import { Rules } from './ui/Rules.ui';
 
 export function CoursePage() {
@@ -35,7 +35,6 @@ export function CoursePage() {
         </div>
       </Paper>
       <Title>ПИМ-1-24</Title>
-      <Table />
       <Rules />
       <Paper className="shadow-none my-5">
         <Typography variant="h6">Теоретическая информация</Typography>

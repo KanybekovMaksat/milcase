@@ -1,12 +1,15 @@
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import { userContracts, userQueries, userTypes } from '~entities/user';
 import { Button, IconButton, TextField } from '@mui/material';
+import { pathKeys } from '~shared/lib/react-router';
 import { formikContract } from '~shared/lib/zod';
 import { withErrorBoundary } from 'react-error-boundary';
 import { ErrorHandler } from '~shared/ui/error';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { ModalPopup } from '~widgets/modal-popup';
 
 function Page() {
   const [visibility, setVisibility] = useState(false);
@@ -23,9 +26,7 @@ function Page() {
 
   return (
     <div className="w-[380px]  mx-auto rounded-md px-5 py-7 ">
-      <h1 className="font-bold  text-2xl text-pc-500">
-        Вход в Bilim<span className="text-blue">Track</span>{' '}
-      </h1>
+      <h1 className="font-bold  text-2xl text-pc-500">Вход в личный кабинет</h1>
       <Formik
         initialValues={initialUser}
         validate={validateForm}
@@ -37,15 +38,21 @@ function Page() {
               <Field
                 as={TextField}
                 fullWidth
-                id="username"
-                name="username"
-                label="Username"
+                id="email"
+                name="email"
+                label="Псевдоним или email"
                 size="small"
                 className="rounded-lg"
               />
               <ErrorMessage name="email" />
             </fieldset>
             <fieldset className="my-5">
+              <Link
+                className="block font-bold text-second-100 text-right mb-2"
+                to={pathKeys.forgotPassword()}
+              >
+                Восстановить
+              </Link>
               <Field
                 as={TextField}
                 fullWidth
@@ -62,11 +69,7 @@ function Page() {
                       color="info"
                       onClick={handleClickShowPassword}
                     >
-                      {visibility ? (
-                        <Visibility className="text-blue" />
-                      ) : (
-                        <VisibilityOff className="text-blue" />
-                      )}
+                      {visibility ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   ),
                 }}
@@ -89,16 +92,22 @@ function Page() {
       </Formik>
 
       {isError && (
-        <p className="text-center text-xs text-red">
+        <p className="text-center text-xs text-[red]">
           Ошибка при выполнении запроса
         </p>
       )}
+      <p className=" text-sm flex items-center justify-center mt-2 gap-1">
+        Нет аккаунта?
+        <Link className="font-bold text-second-100" to={pathKeys.register()}>
+          Зарегистрируйтесь
+        </Link>
+      </p>
     </div>
   );
 }
 
 const initialUser: userTypes.LoginUserDto = {
-  username: '',
+  email: '',
   password: '',
 };
 
@@ -108,7 +117,7 @@ function SubmitButton() {
     <Button
       variant="contained"
       type="submit"
-      className="w-full mb-2 bg-blue shadow-none"
+      className="w-full mb-2 bg-second-100 shadow-none"
       disabled={!isValid || isValidating}
     >
       Войти
@@ -118,6 +127,6 @@ function SubmitButton() {
 
 const validateForm = formikContract(userContracts.LoginUserDtoSchema);
 
-export const AuthPage = withErrorBoundary(Page, {
+export const LoginPage = withErrorBoundary(Page, {
   fallbackRender: ({ error }) => <ErrorHandler error={error} />,
 });

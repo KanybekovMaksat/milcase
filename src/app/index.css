@@ -2,3 +2,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.slider-banner .swiper-pagination-bullet {
+  width: 15px;
+  height: 6px;
+  display: inline-block;
+  background: #000000;
+  margin: 0 5px;
+  border-radius: 20px;
+  transition: opacity 0.5s, background-color 0.5s, width 0.5s;
+  transition-delay: 0.5s, 0.5s, 0s;
+}
+.swiper-pagination-clickable .swiper-pagination-bullet {
+  cursor: pointer;
+}
+.slider-banner .swiper-pagination-bullet-active {
+  background: #767ec4;
+  width: 45px;
+  transition-delay: 0s;
+}

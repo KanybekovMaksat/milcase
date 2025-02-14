@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 import {  getCookie, setCookie } from 'typescript-cookie';
 
-export const API_URL = 'https://api.bilim-track.makalabox.com/api/';
+export const API_URL = 'https://milcase.makalabox.com/api';
 
 const $api = axios.create({
   withCredentials: true,

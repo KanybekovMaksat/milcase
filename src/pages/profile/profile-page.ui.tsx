@@ -1,39 +1,35 @@
-import { EmojiEvents } from '@mui/icons-material';
 import { Avatar, Typography, Paper, Chip } from '@mui/material';
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import GroupIcon from '@mui/icons-material/Group';
-import { BadgeCard } from '~widgets/badge-card';
 import { userQueries } from '~entities/user';
-import { Chart } from '~widgets/chart';
+import TollIcon from '@mui/icons-material/Toll';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 
+import Box from '@mui/material/Box';
+import { useState } from 'react';
 
-interface Achievement {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  rarity: string;
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', mr: 1 }}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 35 }}>
+        <Typography
+          variant="body2"
+          sx={{ color: 'text.secondary' }}
+        >{`${Math.round(props.value)}%`}</Typography>
+      </Box>
+    </Box>
+  );
 }
 
-interface Profile {
-  username: string;
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  photo_url: string;
-  group_id: string;
-  points: number;
-  achievements: Achievement[];
-}
 
 export function ProfilePage() {
-
+  const [progress, setProgress] = useState(60);
   const {
-    data:userData,
+    data: userData,
     isLoading,
-    isError
+    isError,
   } = userQueries.useLoginUserQuery();
 
   if (isLoading) {
@@ -43,6 +39,8 @@ export function ProfilePage() {
   if (isError) {
     return <div>Error fetching user data.</div>;
   }
+
+  console.log(userData.data);
 
   return (
     <div className="my-10 max-w-[400px]">
@@ -54,18 +52,15 @@ export function ProfilePage() {
         <div className="items-center">
           <div className="flex flex-col items-center">
             <Avatar
-              alt="User Photo"
+              alt={userData.data.firstName}
               src={userData.data.photo}
               sx={{ width: 100, height: 100 }}
             />
-            <Typography variant="body2" color="textSecondary" className="mt-2">
-              @{userData.data.username}
-            </Typography>
             <Typography variant="h6" className="text-center">
               {userData.data.firstName} {userData.data.lastName}
             </Typography>
           </div>
- 
+
           <div className="mt-5 flex flex-col items-center">
             <div className="flex flex-col gap-4 ">
               <div className="flex gap-4">
@@ -78,12 +73,14 @@ export function ProfilePage() {
                   }}
                 >
                   <Chip
-                    label={userData.data.group}
+                    label="32"
                     color="primary"
                     className="text-white font-bold"
-                    icon={<GroupIcon className="text-alto" />}
+                    icon={<TollIcon className="text-alto" />}
                   />
-                  <p className="text-[15px] font-bold text-tundora">Группа</p>
+                  <p className="text-[15px] font-bold text-tundora">
+                    Накопленные баллы
+                  </p>
                 </Paper>
                 <Paper
                   className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
@@ -95,75 +92,21 @@ export function ProfilePage() {
                   }}
                 >
                   <Chip
-                    label={userData.data.rating}
-                    color="success"
+                    label="4"
+                    color="primary"
                     className="text-white font-bold"
-                    icon={<EmojiEvents className="text-sun" />}
-                  />
-                  <p className="text-[15px] font-bold text-tundora">Рейтинг</p>
-                </Paper>
-              </div>
-              <div className="flex gap-4">
-                <Paper
-                  className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
-                  elevation={2}
-                  sx={{
-                    padding: 1,
-                    backgroundColor: '#fff3e0',
-                    flex: 1,
-                  }}
-                >
-                  <Chip
-                    label={userData.data.achiviementsCount}
-                    color="warning"
-                    className="text-white font-bold"
-                    icon={<WorkspacePremiumIcon />}
+                    icon={<LoyaltyIcon className="text-alto" />}
                   />
                   <p className="text-[15px] font-bold text-tundora">
-                    Достижений
+                    Куплено чехлов
                   </p>
-                </Paper>
-                <Paper
-                  className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
-                  elevation={2}
-                  sx={{
-                    padding: 1,
-                    backgroundColor: '#fff3e0',
-                  }}
-                >
-                  <Chip
-                    label={userData.data.points}
-                    className="bg-cinnabar text-white font-bold"
-                    icon={<ElectricBoltIcon className="text-yellow" />}
-                  />
-                  <p className="text-[15px] font-bold text-tundora">Баллов</p>
+                  <LinearProgressWithLabel value={progress} />
                 </Paper>
               </div>
             </div>
           </div>
 
-          <div className="mt-5  flex flex-col items-center">
-          <Chart/>
-          </div>
-          <div className="mt-5 flex flex-col items-center">
-            <Typography
-              variant="h6"
-              className="text-center font-semibold text-tundora"
-            >
-              Достижения
-            </Typography>
-            <div className="flex flex-col items-center gap-5">
-              {userData.data.achievements?.map((achievement) => (
-                <BadgeCard
-                  key={achievement.id}
-                  image={achievement.photo}
-                  title={achievement.name}
-                  description={achievement.description}
-                  rarity={achievement.rarity.name}
-                />
-              ))}
-            </div>
-          </div>
+          <div className="mt-5  flex flex-col items-center"></div>
         </div>
       </Paper>
     </div>

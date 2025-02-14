@@ -10,7 +10,6 @@ export function GenericLayout() {
       <main className="flex-grow max-w-[1200px] mx-auto">
         <Outlet />
       </main>
-      <Navigator />
       <Footer />
     </div>
   );
@@ -24,14 +23,14 @@ export function IntroLayout() {
   );
 }
 
-interface ProtectedRouteProps {
-  isAuthenticated: boolean;
-  redirectPath?: string;
-}
+// interface ProtectedRouteProps {
+//   isAuthenticated: boolean;
+//   redirectPath?: string;
+// }
 
-export function ProtectedRoute({
-  isAuthenticated,
-  redirectPath = '/auth',
-}: ProtectedRouteProps) {
-  return isAuthenticated ? <Outlet /> : <Navigate to={redirectPath} replace />;
-}
+// export function ProtectedRoute({
+//   isAuthenticated,
+//   redirectPath = '/auth',
+// }: ProtectedRouteProps) {
+//   return isAuthenticated ? <Outlet /> : <Navigate to={redirectPath} replace />;
+// }
