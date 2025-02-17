@@ -1,9 +1,10 @@
 import {
+  Link,
   RouterProvider,
   createBrowserRouter,
   useRouteError,
 } from 'react-router-dom';
-import { dashboardPageRoute } from '../../pages/dashboard';
+import {  homePageRoute } from '../../pages/home';
 import { coursesPageRoute } from '../../pages/courses';
 import { profilePageRoute } from '../../pages/profile';
 import { rankingPageRoute } from '../../pages/ranking/ranking-page.route';
@@ -26,8 +27,9 @@ function BubbleError() {
   }
   return (
     <div className="text-center text-red-500">
-      <h1>Ошибка!</h1>
-      <p>Что-то пошло не так. Пожалуйста, попробуйте позже.</p>
+      <h1>404!</h1>
+      <p>Не найдена такая страница</p>
+      <Link className='py-[10px] px-[30px] border bg-blue' to="/">Вернуться на главную</Link>
     </div>
   );
 }
@@ -40,7 +42,7 @@ const router = createBrowserRouter([
     element: <GenericLayout />,
     errorElement: <BubbleError />,
     children: [
-      dashboardPageRoute,
+      homePageRoute,
       coursesPageRoute,
       profilePageRoute,
       rankingPageRoute,

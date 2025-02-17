@@ -8,7 +8,7 @@ import { ProductList } from '~widgets/product-list';
 import { Bestsellers } from '~widgets/bestsellers';
 import { Map } from '~widgets/map';
 
-export function DashboardPage() {
+export function HomePage() {
   const slides = [
     {
       id: 1,
