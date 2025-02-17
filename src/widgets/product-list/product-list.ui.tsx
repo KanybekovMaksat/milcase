@@ -73,7 +73,7 @@ export const ProductList = () => {
     }
   };
   return (
-    <div className=" w-full max-w-7xl flex flex-wrap justify-between px-4 py-8 gap-5">
+    <div className="w-full flex flex-wrap  px-4 py-8 gap-5">
       {products.map((product) => (
         <div
           key={product.id}

@@ -10,8 +10,8 @@ export function Header() {
 
   const navigate = useNavigate()
   return (
-    <AppBar position="static" className="bg-white shadow font-medium px-6 md:px-20 border-b border-milk">
-      <Toolbar className="flex justify-between">
+    <AppBar position="static" className="bg-white shadow font-medium px-1 md:px-6 md:px-20 border-b border-milk">
+      <Toolbar className="flex justify-between w-full">
         <Link to={pathKeys.home()} className="flex items-center gap-2">
         <img src="/public/logo.png"  className="h-[50px] rounded-full" alt="" />
           {/* <Typography className="font-semibold text-[20px] text-milk">Milcase</Typography> */}
@@ -55,11 +55,11 @@ export function Header() {
               <LoginIcon className="text-violet" />
             </IconButton>
           </Tooltip>
-          <div className="md:hidden">
+          {/* <div className="md:hidden">
             <IconButton  edge="end" color="inherit">
-              <MenuIcon className="text-gray-600" />
+              <MenuIcon className="text-black" />
             </IconButton>
-          </div>
+          </div> */}
         </div>
       </Toolbar>
     </AppBar>

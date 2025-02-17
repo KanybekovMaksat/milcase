@@ -5,7 +5,7 @@ import { Title } from '~shared/ui/title';
 
 export const Map = () => {
   return (
-    <section className="flex items-center gap-8">
+    <section className="flex flex-col md:flex-row p-6 md:p-0 items-center gap-8">
       <div>
         <Title>Карта филиалов</Title>
         <img src="/mockup.png" alt="Карта филиалов" />

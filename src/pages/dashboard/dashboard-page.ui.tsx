@@ -34,8 +34,38 @@ export function DashboardPage() {
   ];
 
   return (
-    <div className="my-10 flex justify-center items-center flex-col gap-6">
-      <div className="slider-banner w-full max-w-7xl px-4">
+    <div className="w-full my-10 flex justify-center items-center flex-col gap-6">
+      {/* <div className="slider-banner w-full md:max-w-7xl px-4">
+        <Swiper
+          modules={[Pagination, EffectFade, Autoplay]}
+          pagination={{ clickable: true }}
+          effect="fade"
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop={true}
+          className="h-[20rem] md:h-[16rem] sm:h-[12rem]"
+        >
+          {slides.map((slide) => (
+            <SwiperSlide key={slide.id}>
+              <div className="relative w-full h-full">
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex flex-col justify-center items-center text-white px-4 text-center">
+                  <h2 className="text-2xl md:text-xl sm:text-lg font-bold mb-2">
+                    {slide.title}
+                  </h2>
+                  <p className="text-base md:text-sm sm:text-xs">
+                    {slide.description}
+                  </p>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div> */}
+      <div className="slider-banner w-full md:max-w-7xl px-4">
         <Swiper
           modules={[Pagination, EffectFade, Autoplay]}
           pagination={{ clickable: true }}
@@ -65,6 +95,7 @@ export function DashboardPage() {
           ))}
         </Swiper>
       </div>
+
       <ProductList/>
       <Bestsellers/>
       <Map/>
