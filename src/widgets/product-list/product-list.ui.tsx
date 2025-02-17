@@ -77,7 +77,7 @@ export const ProductList = () => {
       {products.map((product) => (
         <div
           key={product.id}
-          className="relative flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-64 h-70"
+          className="relative w-full flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow md:w-64 h-70"
         >
           <img
             src={product.image}
