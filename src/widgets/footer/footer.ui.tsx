@@ -9,7 +9,7 @@ export function Footer() {
     <Box component="footer" className="bg-violet text-white py-8 px-6 md:px-20">
       <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
         <Link to="/" className="flex items-center mb-6 lg:mb-0">
-        <img src="/public/logo.png"  className="h-[50px] rounded-full" alt="" />
+        <img src="/logo.png"  className="h-[50px] rounded-full" alt="" />
           {/* <Typography
             variant="h6"
             component="div"

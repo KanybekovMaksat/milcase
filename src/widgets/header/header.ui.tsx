@@ -39,7 +39,7 @@ export function Header() {
         </div>
         <Link to={pathKeys.home()} className="flex items-center gap-2">
           <img
-            src="/public/logo.png"
+            src="/logo.png"
             className="h-[50px] rounded-full"
             alt="Logo"
           />

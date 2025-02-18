@@ -1,4 +1,4 @@
-import { getProducts } from './product.api';
+import { getAdsProducts, getProducts } from './product.api';
 import {
   useQuery,
   queryOptions as tsqQueryOptions,
@@ -7,6 +7,7 @@ import {
 const keys = {
   root: () => ['product'],
   getProducts: () => [...keys.root(), 'products'] as const,
+  getAdProducts: () => [...keys.root(), 'ad-products'] as const,
 };
 
 
@@ -17,3 +18,9 @@ export function useGetRankingByGroups() {
   });
 }
 
+export function useGetAdProducts(){
+  return useQuery({
+    queryKey: keys.getAdProducts(),
+    queryFn: getAdsProducts,
+  })
+}
