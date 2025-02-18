@@ -11,7 +11,7 @@ const keys = {
 };
 
 
-export function useGetRankingByGroups() {
+export function useGetProducts() {
   return useQuery({
     queryKey: keys.getProducts(),
     queryFn: getProducts,
