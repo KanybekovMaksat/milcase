@@ -1,15 +1,23 @@
-import { getAdsProducts, getProducts } from './product.api';
+import {
+  getAdsProducts,
+  getFavoriteProduct,
+  getFavorites,
+  getProducts,
+} from './product.api';
 import {
   useQuery,
   queryOptions as tsqQueryOptions,
+  useMutation,
+  useQueryClient,
 } from '@tanstack/react-query';
 
 const keys = {
   root: () => ['product'],
   getProducts: () => [...keys.root(), 'products'] as const,
   getAdProducts: () => [...keys.root(), 'ad-products'] as const,
+  getFavoriteProducts: () => [...keys.root(), 'fav'] as const,
+  favProduct: (id: number) => [...keys.root(), 'favorite', id] as const,
 };
-
 
 export function useGetProducts() {
   return useQuery({
@@ -18,9 +26,28 @@ export function useGetProducts() {
   });
 }
 
-export function useGetAdProducts(){
+export function useGetAdProducts() {
   return useQuery({
     queryKey: keys.getAdProducts(),
     queryFn: getAdsProducts,
-  })
+  });
+}
+
+export function useFavoriteProduct(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: keys.favProduct(id),
+    mutationFn: () => getFavoriteProduct(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: keys.favProduct(id) });
+      await queryClient.invalidateQueries({ queryKey: keys.root() });
+    },
+  });
+}
+
+export function useGetFavoriteProducts() {
+  return useQuery({
+    queryKey: keys.getFavoriteProducts(),
+    queryFn: getFavorites,
+  });
 }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import  $api  from '~shared/api';
 
 const API = "https://milcase.makalabox.com/api"
 
@@ -12,3 +13,10 @@ export function getAdsProducts(){
   return axios.get(`${API}/ad-slides/`)
 }
 
+export function getFavoriteProduct(id: number) {
+  return $api.get(`favorites/${id}/`);
+}
+
+export function getFavorites(){
+  return $api.get(`favorites/`);
+}

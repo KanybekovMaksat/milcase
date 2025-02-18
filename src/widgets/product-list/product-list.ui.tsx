@@ -1,13 +1,9 @@
-import { useState } from 'react';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { productQueries } from '~entities/product';
 import { CircularProgress } from '@mui/material';
+import { FavoriteButton } from '~features/product-card/favorite-button';
 
 export const ProductList = () => {
-  const [favorites, setFavorites] = useState<number[]>([]);
-
   const {
     data: productData,
     isLoading,
@@ -35,14 +31,6 @@ export const ProductList = () => {
     );
   }
 
-  const toggleFavorite = (id: number) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((fav) => fav !== id));
-    } else {
-      setFavorites([...favorites, id]);
-    }
-  };
-
   return (
     <div className="w-full flex flex-wrap  px-4 py-8 gap-5">
       {productData.data.results.map((product) => (
@@ -63,22 +51,12 @@ export const ProductList = () => {
               {Math.floor(product.price)}
               <img src="/som.png" alt="" className="w-[20px] h-[20px]" />
             </p>
-
             <div className="mt-auto flex items-center justify-between">
               <button className="px-4 py-1 bg-blue-600 border  text-violet hover:bg-violet transition-all duration-300 hover:text-white border-violet rounded-lg flex items-center gap-2">
                 <ShoppingCartIcon fontSize="small" className="text-inherit" />В
                 корзину
               </button>
-              <button
-                className="border border-milk p-1 rounded-lg  "
-                onClick={() => toggleFavorite(product.id)}
-              >
-                {favorites.includes(product.id) ? (
-                  <FavoriteIcon fontSize="small" className="text-milk" />
-                ) : (
-                  <FavoriteBorderIcon fontSize="small" className="text-milk" />
-                )}
-              </button>
+              <FavoriteButton id={product.id}/>
             </div>
           </div>
         </div>
