@@ -221,7 +221,7 @@ function Page() {
       )}
       <p className=" text-sm flex items-center justify-center mt-2 gap-1">
         Уже есть аккаунт?
-        <Link className="font-bold text-second-100" to={pathKeys.login()}>
+        <Link className="font-bold text-violet" to={pathKeys.login()}>
           Войдите
         </Link>
       </p>
@@ -235,7 +235,7 @@ function SubmitButton() {
     <Button
       variant="contained"
       type="submit"
-      className="w-full mb-2 bg-second-100"
+      className="w-full mb-2 bg-milk"
       disabled={!isValid || isValidating}
     >
       Зарегистрироваться

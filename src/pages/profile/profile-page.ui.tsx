@@ -1,13 +1,20 @@
-import { Avatar, Typography, Paper, Chip } from '@mui/material';
+import { Avatar, Typography, Paper, Chip, Button } from '@mui/material';
 import { userQueries } from '~entities/user';
 import TollIcon from '@mui/icons-material/Toll';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
-import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
+import LinearProgress, {
+  LinearProgressProps,
+} from '@mui/material/LinearProgress';
 
 import Box from '@mui/material/Box';
 import { useState } from 'react';
+import { removeCookie } from 'typescript-cookie';
+import { useNavigate } from 'react-router-dom';
+import { pathKeys } from '~shared/lib/react-router';
 
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+function LinearProgressWithLabel(
+  props: LinearProgressProps & { value: number }
+) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
@@ -23,14 +30,22 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
   );
 }
 
-
 export function ProfilePage() {
   const [progress, setProgress] = useState(60);
+  const navigate = useNavigate()
   const {
     data: userData,
     isLoading,
     isError,
   } = userQueries.useLoginUserQuery();
+
+  const handleLogout = () => {
+    removeCookie('access');
+    localStorage.removeItem('refreshMilcase');
+    navigate(`${pathKeys.home()}`);
+    userQueries.userService.removeCache();
+  };
+
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -43,19 +58,14 @@ export function ProfilePage() {
   console.log(userData.data);
 
   return (
-    <div className="my-10 max-w-[400px]">
+    <div className="my-10 max-w-[400px] mx-auto">
       <Paper
         elevation={3}
         sx={{ padding: 2 }}
-        className="shadow-none border border-alto"
+        className="shadow-none border border-alto mx-auto"
       >
-        <div className="items-center">
+        <div>
           <div className="flex flex-col items-center">
-            <Avatar
-              alt={userData.data.firstName}
-              src={userData.data.photo}
-              sx={{ width: 100, height: 100 }}
-            />
             <Typography variant="h6" className="text-center">
               {userData.data.firstName} {userData.data.lastName}
             </Typography>
@@ -103,11 +113,23 @@ export function ProfilePage() {
                   <LinearProgressWithLabel value={progress} />
                 </Paper>
               </div>
+                <Button variant='contained' className='bg-milk shadow-none' onClick={handleLogout}>Выйти</Button>
             </div>
           </div>
 
           <div className="mt-5  flex flex-col items-center"></div>
         </div>
+      </Paper>
+      <Paper
+        elevation={3}
+        sx={{ padding: 2 }}
+        className="shadow-none border border-alto mx-auto"
+      >
+            <Typography variant="h6" className="text-center">
+              История покупок
+            </Typography>
+    
+
       </Paper>
     </div>
   );

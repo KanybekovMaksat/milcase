@@ -1,6 +1,8 @@
 import { productQueries } from '~entities/product';
 import { CircularProgress } from '@mui/material';
 import ProductCard from './../../entities/product/ui/Card';
+import { Link } from 'react-router-dom';
+import { pathKeys } from '~shared/lib/react-router';
 
 export const ProductList = () => {
   const {
@@ -31,10 +33,18 @@ export const ProductList = () => {
   }
 
   return (
-    <div className="w-full flex flex-wrap  px-4 py-8 gap-5">
-      {productData.data.results.map((product) => (
-        <ProductCard product={product}/>
-      ))}
+    <div className="w-full px-4 py-8 flex flex-col">
+      <div className="w-full flex flex-wrap justify-between">
+        {productData.data.results.slice(0, 8).map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+      <Link
+        to={pathKeys.catalog()}
+        className="underline text-violet font-semibold text-end mt-4"
+      >
+        В Каталог
+      </Link>
     </div>
   );
 };

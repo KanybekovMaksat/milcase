@@ -79,30 +79,30 @@ export function Header() {
           )}
         </div>
         <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleCloseMenu}>
-          <MenuItem onClick={handleCloseMenu}>
-            <Link
-              to={pathKeys.ranking()}
+          <Link to={pathKeys.catalog()} className="no-underline">
+            <MenuItem
+              onClick={handleCloseMenu}
               className="text-dove hover:text-milk font-semibold text-[16px]"
             >
               Каталог
-            </Link>
-          </MenuItem>
-          <MenuItem onClick={handleCloseMenu}>
-            <Link
-              to={pathKeys.course.root()}
+            </MenuItem>
+          </Link>
+          <Link to={pathKeys.about()} className="no-underline">
+            <MenuItem
+              onClick={handleCloseMenu}
               className="text-dove hover:text-milk font-semibold text-[16px]"
             >
               О нас
-            </Link>
-          </MenuItem>
-          <MenuItem onClick={handleCloseMenu}>
-            <Link
-              to={pathKeys.loyalty()}
+            </MenuItem>
+          </Link>
+          <Link to={pathKeys.loyalty()} className="no-underline">
+            <MenuItem
+              onClick={handleCloseMenu}
               className="text-dove hover:text-milk font-semibold text-[16px]"
             >
               Программа лояльности
-            </Link>
-          </MenuItem>
+            </MenuItem>
+          </Link>
         </Menu>
       </Toolbar>
     </AppBar>

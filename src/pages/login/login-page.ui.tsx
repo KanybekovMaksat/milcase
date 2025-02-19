@@ -48,7 +48,7 @@ function Page() {
             </fieldset>
             <fieldset className="my-5">
               <Link
-                className="block font-bold text-second-100 text-right mb-2"
+                className="block font-bold text-violet text-right mb-2"
                 to={pathKeys.forgotPassword()}
               >
                 Восстановить
@@ -81,7 +81,7 @@ function Page() {
             <Button
               variant="contained"
               disabled
-              className=" text-center  w-full"
+              className=" text-center bg-milk  w-full"
             >
               Выполняется вход...
             </Button>
@@ -117,7 +117,7 @@ function SubmitButton() {
     <Button
       variant="contained"
       type="submit"
-      className="w-full mb-2 bg-second-100 shadow-none"
+      className="w-full mb-2 bg-milk shadow-none"
       disabled={!isValid || isValidating}
     >
       Войти

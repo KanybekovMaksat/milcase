@@ -4,12 +4,10 @@ import {
   createBrowserRouter,
   useRouteError,
 } from 'react-router-dom';
-import {  homePageRoute } from '../../pages/home';
-import { coursesPageRoute } from '../../pages/courses';
+import { homePageRoute } from '../../pages/home';
 import { profilePageRoute } from '../../pages/profile';
-import { rankingPageRoute } from '../../pages/ranking/ranking-page.route';
+import { catalogPageRoute } from '../../pages/catalog/catalog-page.route';
 import { GenericLayout, IntroLayout } from '../../pages/layout';
-import { coursePageRoute } from '~pages/course';
 import { aboutPageRoute } from '~pages/about';
 import { ProtectedRoute } from '~pages/layout/layout.ui';
 import { getCookie } from 'typescript-cookie';
@@ -30,7 +28,9 @@ function BubbleError() {
     <div className="text-center text-red-500">
       <h1>404!</h1>
       <p>Не найдена такая страница</p>
-      <Link className='py-[10px] px-[30px] border bg-blue' to="/">Вернуться на главную</Link>
+      <Link className="py-[10px] px-[30px] border bg-blue" to="/">
+        Вернуться на главную
+      </Link>
     </div>
   );
 }
@@ -44,17 +44,15 @@ const router = createBrowserRouter([
     errorElement: <BubbleError />,
     children: [
       homePageRoute,
-      coursesPageRoute,
       profilePageRoute,
-      rankingPageRoute,
+      catalogPageRoute,
       aboutPageRoute,
-      coursePageRoute,
       aboutPageRoute,
       loyaltyPageRoute,
       loginPageRoute,
       verifyPageRoute,
       registerPageRoute,
-      favoritePageRoute
+      favoritePageRoute,
     ],
   },
 ]);

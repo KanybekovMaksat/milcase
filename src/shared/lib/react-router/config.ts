@@ -29,8 +29,8 @@ export const pathKeys = {
   forgotPassword(){
     return pathKeys.root.concat("forgot-password/")
   },
-  ranking() {
-    return pathKeys.root.concat('ranking/');
+  catalog() {
+    return pathKeys.root.concat('catalog/');
   },
   register(){
     return pathKeys.root.concat('register/')
