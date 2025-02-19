@@ -5,6 +5,9 @@ export const pathKeys = {
   home() {
     return pathKeys.root;
   },
+  favorite(){
+    return pathKeys.root.concat('favorites/')
+  },
   about() {
     return pathKeys.root.concat('about/');
   },

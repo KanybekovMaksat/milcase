@@ -17,6 +17,7 @@ import { loyaltyPageRoute } from '~pages/loyalty';
 import { loginPageRoute } from '~pages/login';
 import { registerPageRoute } from '~pages/register';
 import { verifyPageRoute } from '~pages/verify';
+import { favoritePageRoute } from '~pages/favorite';
 
 function BubbleError() {
   const error = useRouteError();
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
       loginPageRoute,
       verifyPageRoute,
       registerPageRoute,
+      favoritePageRoute
     ],
   },
 ]);

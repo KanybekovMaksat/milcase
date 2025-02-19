@@ -4,8 +4,8 @@ import { getCookie } from 'typescript-cookie';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { pathKeys } from '~shared/lib/react-router';
-import FavoriteIcon  from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon  from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { productQueries } from '~entities/product';
 
 type FavoriteButtonProps = { id: number };
@@ -13,10 +13,6 @@ type FavoriteButtonProps = { id: number };
 export function FavoriteButton(props: FavoriteButtonProps) {
   const isAuth = getCookie('access');
   const navigate = useNavigate();
-
-  const redirectToRegisterPage = () => {
-    navigate(pathKeys.register());
-  };
 
   const { mutate: saveFavorite, isPending } = productQueries.useFavoriteProduct(
     props.id
@@ -33,8 +29,8 @@ export function FavoriteButton(props: FavoriteButtonProps) {
     return (
       <Tooltip title={'Нужна авторизация'}>
         <span>
-          <IconButton onClick={redirectToRegisterPage} aria-label="В Избранное">
-            <BookmarkAddIcon />
+          <IconButton aria-label="В Избранное">
+            <FavoriteBorderIcon fontSize="small" className="text-milk" />
           </IconButton>
         </span>
       </Tooltip>
@@ -58,7 +54,11 @@ export function FavoriteButton(props: FavoriteButtonProps) {
         isFavoritedPosts ? 'Удалить из избранных' : 'Сохранить в избранные'
       }
     >
-      <IconButton className='border border-milk p-1 rounded-lg ' onClick={handleSaveFavorite} aria-label="В Избранное">
+      <IconButton
+        className="border border-milk p-1 rounded-lg "
+        onClick={handleSaveFavorite}
+        aria-label="В Избранное"
+      >
         {isFavoritedPosts ? (
           <FavoriteIcon fontSize="small" className="text-milk" />
         ) : (
@@ -69,7 +69,8 @@ export function FavoriteButton(props: FavoriteButtonProps) {
   );
 }
 
-              {/* <button
+{
+  /* <button
                 className="border border-milk p-1 rounded-lg  "
                 onClick={() => toggleFavorite(product.id)}
               >
@@ -78,4 +79,5 @@ export function FavoriteButton(props: FavoriteButtonProps) {
                 ) : (
                   <FavoriteBorderIcon fontSize="small" className="text-milk" />
                 )}
-              </button> */}
+              </button> */
+}

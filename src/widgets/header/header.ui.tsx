@@ -1,17 +1,27 @@
 import React, { useState, useRef } from 'react';
-import { AppBar, Toolbar, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import LocalMallRoundedIcon from '@mui/icons-material/LocalMallRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import LoginIcon from '@mui/icons-material/Login';
 import { Link, useNavigate } from 'react-router-dom';
 import { pathKeys } from '~shared/lib/react-router';
+import { getCookie } from 'typescript-cookie';
 
 export function Header() {
+  const isAuth = getCookie('access');
   const [menuOpen, setMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
-  
+
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -25,7 +35,10 @@ export function Header() {
   };
 
   return (
-    <AppBar position="fixed" className="bg-white  shadow font-medium px-1 md:px-20 border-b border-milk ">
+    <AppBar
+      position="fixed"
+      className="bg-white  shadow font-medium px-1 md:px-20 border-b border-milk "
+    >
       <Toolbar className="flex justify-between w-full">
         <div className="">
           <IconButton
@@ -38,34 +51,34 @@ export function Header() {
           </IconButton>
         </div>
         <Link to={pathKeys.home()} className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            className="h-[50px] rounded-full"
-            alt="Logo"
-          />
+          <img src="/logo.png" className="h-[50px] rounded-full" alt="Logo" />
         </Link>
         <div className="flex items-center gap-1">
           <Tooltip title="Избранное">
-            <IconButton color="inherit">
+            <IconButton onClick={() => navigate('/favorites')} color="inherit">
               <FavoriteRoundedIcon className="text-violet" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Корзина">
-            <IconButton color="inherit">
+            <IconButton onClick={() => navigate('/my-cart')} color="inherit">
               <LocalMallRoundedIcon className="text-violet" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Войти">
-            <IconButton onClick={() => navigate('/login')} color="inherit">
-              <PersonRoundedIcon className="text-violet" />
-            </IconButton>
-          </Tooltip>
+          {isAuth ? (
+            <Tooltip title="Личный кабинет">
+              <IconButton onClick={() => navigate('/profile')} color="inherit">
+                <PersonRoundedIcon className="text-violet" />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Войти">
+              <IconButton onClick={() => navigate('/login')} color="inherit">
+                <LoginIcon className="text-violet" />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
-        <Menu
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={handleCloseMenu}
-        >
+        <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleCloseMenu}>
           <MenuItem onClick={handleCloseMenu}>
             <Link
               to={pathKeys.ranking()}
@@ -95,4 +108,3 @@ export function Header() {
     </AppBar>
   );
 }
-
