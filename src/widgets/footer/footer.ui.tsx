@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import FacebookIcon from "@mui/icons-material/Facebook";
+import { pathKeys } from "~shared/lib/react-router";
 
 export function Footer() {
   return (
@@ -20,17 +21,20 @@ export function Footer() {
         </Link>
 
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-          <Link to="/about" className="text-gray-300 hover:text-white text-sm">
+          <Link to={pathKeys.about()} className="text-gray-300 hover:text-white text-sm">
             О платформе
           </Link>
-          <Link to="/catalog" className="text-gray-300 hover:text-white text-sm">
+          <Link to={pathKeys.catalog()} className="text-gray-300 hover:text-white text-sm">
             Каталог
           </Link>
           <Link to="/loyalty" className="text-gray-300 hover:text-white text-sm">
             Программа лояльности
           </Link>
-          <Link to="/contact" className="text-gray-300 hover:text-white text-sm">
-            Контакты
+          <Link to={pathKeys.terms()} className="text-gray-300 hover:text-white text-sm">
+          Условия использования
+          </Link>
+          <Link to={pathKeys.policy()} className="text-gray-300 hover:text-white text-sm">
+          Политика конфиденциальности
           </Link>
         </div>
 

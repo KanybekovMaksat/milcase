@@ -16,6 +16,8 @@ import { loginPageRoute } from '~pages/login';
 import { registerPageRoute } from '~pages/register';
 import { verifyPageRoute } from '~pages/verify';
 import { favoritePageRoute } from '~pages/favorite';
+import { termsPageRoute } from '~pages/terms';
+import { policyPageRoute } from '~pages/policy';
 
 function BubbleError() {
   const error = useRouteError();
@@ -49,8 +51,10 @@ const router = createBrowserRouter([
       aboutPageRoute,
       aboutPageRoute,
       loyaltyPageRoute,
+      policyPageRoute,
       loginPageRoute,
       verifyPageRoute,
+      termsPageRoute,
       registerPageRoute,
       favoritePageRoute,
     ],
