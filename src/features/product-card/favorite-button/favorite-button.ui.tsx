@@ -1,5 +1,4 @@
 import { CircularProgress, IconButton, Tooltip } from '@mui/material';
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import { getCookie } from 'typescript-cookie';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,10 @@ export function FavoriteButton(props: FavoriteButtonProps) {
     return (
       <Tooltip title={'Нужна авторизация'}>
         <span>
-          <IconButton aria-label="В Избранное">
+          <IconButton
+            onClick={() => navigate(pathKeys.login())}
+            aria-label="В Избранное"
+          >
             <FavoriteBorderIcon fontSize="small" className="text-milk" />
           </IconButton>
         </span>

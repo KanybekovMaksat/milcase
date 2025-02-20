@@ -1,6 +1,7 @@
 import React from 'react';
 import { FavoriteButton } from '~features/product-card/favorite-button';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { CartButton } from './../../../features/product-card/cart-button/cart-button.ui';
+
 
 const ProductCard = ({ product }) => {
   return (
@@ -22,9 +23,10 @@ const ProductCard = ({ product }) => {
           <img src="/som.png" alt="currency" className="w-[20px] h-[20px]" />
         </p>
         <div className="mt-auto flex items-center justify-between">
-          <button className="px-4 py-1 bg-blue-600 border text-violet hover:bg-violet transition-all duration-300 hover:text-white border-violet rounded-lg flex items-center gap-2">
+          {/* <button className="px-4 py-1 bg-blue-600 border text-violet hover:bg-violet transition-all duration-300 hover:text-white border-violet rounded-lg flex items-center gap-2">
             <ShoppingCartIcon fontSize="small" className="text-inherit" />В корзину
-          </button>
+          </button> */}
+          <CartButton/>
           <FavoriteButton id={product.id} />
         </div>
       </div>
