@@ -2,7 +2,6 @@ import React from 'react';
 import { FavoriteButton } from '~features/product-card/favorite-button';
 import { CartButton } from './../../../features/product-card/cart-button/cart-button.ui';
 
-
 const ProductCard = ({ product }) => {
   return (
     <div
