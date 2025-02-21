@@ -1,5 +1,6 @@
 import {
   getAdsProducts,
+  getCategories,
   getFavoriteProduct,
   getFavorites,
   getProducts,
@@ -13,10 +14,13 @@ import {
 
 const keys = {
   root: () => ['product'],
+  category:() => ['category'],
   getProducts: () => [...keys.root(), 'products'] as const,
   getAdProducts: () => [...keys.root(), 'ad-products'] as const,
   getFavoriteProducts: () => [...keys.root(), 'fav'] as const,
+  getCategories: () => [...keys.category(), 'categories'] as const,
   favProduct: (id: number) => [...keys.root(), 'favorite', id] as const,
+
 };
 
 export function useGetProducts() {
@@ -49,5 +53,12 @@ export function useGetFavoriteProducts() {
   return useQuery({
     queryKey: keys.getFavoriteProducts(),
     queryFn: getFavorites,
+  });
+}
+
+export function useGetCategories() {
+  return useQuery({
+    queryKey: keys.getCategories(),
+    queryFn: getCategories,
   });
 }

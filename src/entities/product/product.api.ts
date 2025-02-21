@@ -20,3 +20,8 @@ export function getFavoriteProduct(id: number) {
 export function getFavorites(){
   return $api.get(`favorites/`);
 }
+
+
+export function getCategories(){
+  return axios.get(`${API}/categories/`)
+}
