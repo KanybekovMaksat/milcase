@@ -18,6 +18,8 @@ import { verifyPageRoute } from '~pages/verify';
 import { favoritePageRoute } from '~pages/favorite';
 import { termsPageRoute } from '~pages/terms';
 import { policyPageRoute } from '~pages/policy';
+import { cartPageRoute } from './../../pages/cart/cart-page.route';
+import { orderPageRoute } from '~pages/order';
 
 function BubbleError() {
   const error = useRouteError();
@@ -57,6 +59,8 @@ const router = createBrowserRouter([
       termsPageRoute,
       registerPageRoute,
       favoritePageRoute,
+      cartPageRoute,
+      orderPageRoute,
     ],
   },
 ]);

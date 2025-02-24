@@ -11,6 +11,12 @@ export const pathKeys = {
   about() {
     return pathKeys.root.concat('about/');
   },
+  cart() {
+    return pathKeys.root.concat('cart/');
+  },
+  order(){
+    return pathKeys.root.concat('order/')
+  },
   terms() {
     return pathKeys.root.concat('terms-of-use/');
   },

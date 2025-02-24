@@ -23,9 +23,9 @@ const ProductCard = ({ product }) => {
         </p>
         <div className="mt-auto flex items-center justify-between">
           {/* <button className="px-4 py-1 bg-blue-600 border text-violet hover:bg-violet transition-all duration-300 hover:text-white border-violet rounded-lg flex items-center gap-2">
-            <ShoppingCartIcon fontSize="small" className="text-inherit" />В корзину
-          </button> */}
-          <CartButton/>
+              <ShoppingCartIcon fontSize="small" className="text-inherit" />В корзину
+            </button> */}
+          <CartButton product={product} />
           <FavoriteButton id={product.id} />
         </div>
       </div>

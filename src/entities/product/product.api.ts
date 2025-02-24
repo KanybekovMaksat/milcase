@@ -25,3 +25,15 @@ export function getFavorites(){
 export function getCategories(){
   return axios.get(`${API}/categories/`)
 }
+
+export function createOrder(orderItems: { product: number; quantity: number }[]) {
+  return $api.post(`orders/me/`, { orderItems });
+}
+
+export function getCartInfo(){
+  return $api.get('orders/me')
+}
+
+export function createPayment(orderId:number){
+  return $api.post(`create-payment/${orderId}/`)
+}

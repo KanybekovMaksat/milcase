@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Badge,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
@@ -15,13 +16,14 @@ import LoginIcon from '@mui/icons-material/Login';
 import { Link, useNavigate } from 'react-router-dom';
 import { pathKeys } from '~shared/lib/react-router';
 import { getCookie } from 'typescript-cookie';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export function Header() {
   const isAuth = getCookie('access');
   const [menuOpen, setMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [cartQuantity, setCartQuantity] = useState(0); // To store the total cart quantity
   const navigate = useNavigate();
-
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,10 +36,37 @@ export function Header() {
     setAnchorEl(null);
   };
 
+  const calculateCartQuantity = () => {
+    // Retrieve cart data from localStorage
+    const cartData = JSON.parse(localStorage.getItem('CARTStorage') || '{}');
+    // Calculate the total quantity of items in the cart
+    return Object.values(cartData).reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+  };
+
+  useEffect(() => {
+    // Set initial cart quantity
+    setCartQuantity(calculateCartQuantity());
+
+    // Listen for changes in localStorage and update cart quantity
+    const handleStorageChange = () => {
+      setCartQuantity(calculateCartQuantity());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   return (
     <AppBar
       position="fixed"
-      className="bg-white  shadow font-medium px-1 md:px-20 border-b border-milk "
+      className="bg-white shadow font-medium px-1 md:px-20 border-b border-milk "
     >
       <Toolbar className="flex justify-between w-full">
         <div className="">
@@ -60,8 +89,13 @@ export function Header() {
             </IconButton>
           </Tooltip>
           <Tooltip title="Корзина">
-            <IconButton onClick={() => navigate('/my-cart')} color="inherit">
-              <LocalMallRoundedIcon className="text-violet" />
+            <IconButton onClick={() => navigate('/cart')} color="inherit">
+              <Badge
+                badgeContent={cartQuantity} // Set the badge content to the cart quantity
+                color="secondary"
+              >
+                <ShoppingCartIcon className="text-violet" />
+              </Badge>
             </IconButton>
           </Tooltip>
           {isAuth ? (

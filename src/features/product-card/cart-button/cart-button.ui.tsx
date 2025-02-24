@@ -1,11 +1,34 @@
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import { useState } from 'react';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
 import { IconButton } from '@mui/material';
+import { useState, useEffect } from 'react';
 
-export const CartButton = () => {
+export const CartButton = ({ product }) => {
   const [quantity, setQuantity] = useState(0);
+
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+    if (cartData[product.id]) {
+      setQuantity(cartData[product.id].quantity);
+    }
+  }, [product.id]);
+
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+
+    if (quantity > 0) {
+      cartData[product.id] = {
+        ...product,
+        quantity,
+      };
+    } else {
+      delete cartData[product.id]; // Если 0, удаляем товар
+    }
+
+    localStorage.setItem('CARTStorage', JSON.stringify(cartData));
+  }, [quantity, product]);
+
   return (
     <div>
       {quantity === 0 ? (
@@ -18,18 +41,19 @@ export const CartButton = () => {
       ) : (
         <div className="flex items-center gap-2 rounded border border-violet">
           <IconButton
-            className="border border-milk p-1 rounded-lg "
+            className="border border-milk p-1 rounded-lg"
             onClick={() => setQuantity((prev) => Math.max(prev - 1, 0))}
-            aria-label="В Избранное"
+            aria-label="Уменьшить"
           >
             <IndeterminateCheckBoxRoundedIcon className="text-milk" />
           </IconButton>
 
           <span className="text-lg font-semibold text-violet">{quantity}</span>
+
           <IconButton
-            className=" p-1 rounded-lg "
-            onClick={() => setQuantity((prev) => Math.max(prev + 1, 0))}
-            aria-label="В Избранное"
+            className="p-1 rounded-lg"
+            onClick={() => setQuantity((prev) => prev + 1)}
+            aria-label="Добавить"
           >
             <AddBoxIcon className="text-milk" />
           </IconButton>

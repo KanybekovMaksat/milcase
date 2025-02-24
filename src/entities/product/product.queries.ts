@@ -1,5 +1,8 @@
 import {
+  createOrder,
+  createPayment,
   getAdsProducts,
+  getCartInfo,
   getCategories,
   getFavoriteProduct,
   getFavorites,
@@ -14,13 +17,15 @@ import {
 
 const keys = {
   root: () => ['product'],
-  category:() => ['category'],
+  category: () => ['category'],
+  cart: () => ['cart'],
+  createOrder: () => [...keys.root(), 'create'] as const,
+  getCart: () => [...keys.root(), 'cart-info'] as const,
   getProducts: () => [...keys.root(), 'products'] as const,
   getAdProducts: () => [...keys.root(), 'ad-products'] as const,
   getFavoriteProducts: () => [...keys.root(), 'fav'] as const,
   getCategories: () => [...keys.category(), 'categories'] as const,
   favProduct: (id: number) => [...keys.root(), 'favorite', id] as const,
-
 };
 
 export function useGetProducts() {
@@ -60,5 +65,36 @@ export function useGetCategories() {
   return useQuery({
     queryKey: keys.getCategories(),
     queryFn: getCategories,
+  });
+}
+
+export function useCreateOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: keys.createOrder(),
+    mutationFn: createOrder,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: keys.cart() });
+    },
+  });
+}
+
+export function useGetCart() {
+  return useQuery({
+    queryKey: keys.getCart(),
+    queryFn: getCartInfo,
+  });
+}
+
+export function useCreatePayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: keys.createOrder(),
+    mutationFn: createPayment,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: keys.cart() });
+    },
   });
 }
