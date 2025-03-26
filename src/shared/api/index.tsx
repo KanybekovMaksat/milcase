@@ -66,7 +66,7 @@
 import axios, { AxiosRequestConfig, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { getCookie, setCookie } from 'typescript-cookie';
 
-export const API_URL = 'https://milcase.makalabox.com/api';
+export const API_URL = 'https://milcase.makalabox.com/api/';
 
 const $api = axios.create({
   withCredentials: true,

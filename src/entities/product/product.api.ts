@@ -1,7 +1,7 @@
 import axios from 'axios';
 import  $api  from '~shared/api';
 
-const API = "https://milcase.makalabox.com/api"
+const API = "https://milcase.makalabox.com/api/";
 
 
 export function getProducts() {

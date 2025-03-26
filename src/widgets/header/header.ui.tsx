@@ -80,7 +80,7 @@ export function Header() {
           </IconButton>
         </div>
         <Link to={pathKeys.home()} className="flex items-center gap-2">
-          <img src="/logo.png" className="h-[50px] rounded-full" alt="Logo" />
+          <img src="/logomilcase.png" className="w-[150px] object-cover h-[50px]" alt="Logo" />
         </Link>
         <div className="flex items-center gap-1">
           <Tooltip title="Избранное">

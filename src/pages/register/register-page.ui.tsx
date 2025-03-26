@@ -4,281 +4,130 @@ import {
   ErrorMessage,
   useFormikContext,
   Field,
-  FormikValues,
 } from 'formik';
 import {
   Box,
   Button,
   IconButton,
-  Modal,
   TextField,
-  Typography,
+  MenuItem,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { pathKeys } from '~shared/lib/react-router';
-import { userQueries, userTypes } from '~entities/user';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { withErrorBoundary } from 'react-error-boundary';
 import { ErrorHandler } from '~shared/ui/error';
+import { userQueries } from '~entities/user';
 
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 3,
-  textAlign: 'center',
-};
-
-const initialUser: userTypes.CreateUserSchema = {
+const initialUser = {
   email: '',
   firstName: '',
   lastName: '',
   password: '',
-  Repassword: '',
-  birthdate: null,  
+  rePassword: '',
+  birthdate: '',
+  phoneModels: [],
 };
 
-
-function Page() {
+function RegisterPageComponent() {
   const [visibility, setVisibility] = useState(false);
-  const handleClickShowPassword = () =>
-    setVisibility((visibility) => !visibility);
+  const handleClickShowPassword = () => setVisibility((prev) => !prev);
 
-  const {
-    mutate: registerUser,
-    isPending,
-    isError,
-    isSuccess,
-  } = userQueries.useRegisterMutation();
+  const { mutate: registerUser, isPending, isSuccess } = userQueries.useRegisterMutation();
+  const { data: models, isLoading, isError } = userQueries.useGetPhoneModels();
 
-  function saveCredentialsToLocalStorage(email: string, password: string) {
-    localStorage.setItem('email', email);
-    localStorage.setItem('password', password);
-  }
-
-  if (isSuccess) {
-    return (
-      <div className="my-20 w-[380px] bg-[white] mx-auto rounded-md px-5 py-7 border border-sc-100">
-        <h1 className="font-bold text-center text-2xl text-pc-500">
-          На вашу почту отправлено письмо для подтверждения вашей почты.
-        </h1>
-      </div>
-    );
-  }
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error loading phone models...</p>;
+  if (isSuccess) return <p>На вашу почту отправлено письмо для подтверждения.</p>;
 
   return (
-    <div className="w-[380px]  mx-auto rounded-md px-5 py-7 ">
+    <div className="w-[380px] mx-auto rounded-md px-5 py-7">
       <h1 className="font-bold text-2xl text-pc-500">Регистрация</h1>
       <Formik
         initialValues={initialUser}
         validate={validateForm}
-        onSubmit={(user) => {
-          registerUser({ user });
-          saveCredentialsToLocalStorage(user.email, user.password);
-        }}
+        onSubmit={(user) => registerUser({ user })}
       >
-        <Form>
-          <fieldset disabled={isPending}>
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="email"
-                name="email"
-                label="Email"
-                size="small"
-              />
-              <ErrorMessage
-                name="email"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="firstName"
-                name="firstName"
-                label="Имя"
-                size="small"
-              />
-              <ErrorMessage
-                name="firstName"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="lastName"
-                name="lastName"
-                size="small"
-                label="Фамилия"
-              />
-              <ErrorMessage
-                name="lastName"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="birthdate"
-                name="birthdate"
-                label="Дата рождения"
-                type="date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                size="small"
-              />
-              <ErrorMessage
-                name="birthdate"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
+        {({ values, setFieldValue }) => (
+          <Form className="flex flex-col gap-[20px]">
+            <CustomField name="email" label="Email" type="email" />
+            <CustomField name="firstName" label="Имя" />
+            <CustomField name="lastName" label="Фамилия" />
+            <CustomField name="birthdate" label="Дата рождения" type="date" />
+            <CustomField name="password" label="Введите пароль" type={visibility ? 'text' : 'password'}
+              endAdornment={
+                <IconButton onClick={handleClickShowPassword}>
+                  {visibility ? '🙈' : '👁️'}
+                </IconButton>
+              }
+            />
+            <CustomField name="rePassword" label="Подтвердите пароль" type={visibility ? 'text' : 'password'} />
 
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="password"
-                name="password"
-                label="Введите пароль"
-                type={visibility ? 'text' : 'password'}
-                size="small"
-                InputProps={{
-                  endAdornment: (
-                    <IconButton
-                      aria-label="password-visibility"
-                      size="small"
-                      color="info"
-                      onClick={handleClickShowPassword}
-                    >
-                      {visibility ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  ),
-                }}
-              />
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
-            <fieldset className="my-5">
-              <Field
-                as={TextField}
-                fullWidth
-                id="rePassword"
-                name="rePassword"
-                label="Подтвердите пароль"
-                type={visibility ? 'text' : 'password'}
-                size="small"
-              />
-              <ErrorMessage
-                name="rePassword"
-                component="div"
-                className="text-xs text-[red]"
-              />
-            </fieldset>
-          </fieldset>
-          {isPending ? (
-            <>
-              <Modal
-                open={!!isPending}
-                onClose={() => false}
-                aria-labelledby="child-modal-title"
-                aria-describedby="child-modal-description"
-              >
-                <Box sx={{ ...style, width: 200 }}>
-                  <h2 id="child-modal-title">Регистрация...</h2>
-                </Box>
-              </Modal>
-            </>
-          ) : (
+            <TextField
+              select
+              fullWidth
+              label="Выберите модели телефонов"
+              value={values.phoneModels || []}
+              onChange={(event) => setFieldValue('phoneModels', event.target.value)}
+              SelectProps={{ multiple: true }}
+              variant="outlined"
+            >
+              <MenuItem value="" disabled>
+                Выберите модели телефонов
+              </MenuItem>
+              {models?.data?.map((model) => (
+                <MenuItem key={model.id} value={model.id}>
+                  {model.brand} {model.modelName}
+                </MenuItem>
+              ))}
+            </TextField>
+            <ErrorMessage name="phoneModels" component="div" className="text-xs text-[red]" />
+
             <SubmitButton />
-          )}
-        </Form>
+          </Form>
+        )}
       </Formik>
-      {isError && (
-        <p className="text-center text-xs text-[red]">
-          Ошибка при выполнении запроса
-        </p>
-      )}
-      <p className=" text-sm flex items-center justify-center mt-2 gap-1">
-        Уже есть аккаунт?
-        <Link className="font-bold text-violet" to={pathKeys.login()}>
-          Войдите
-        </Link>
-      </p>
     </div>
+  );
+}
+
+function CustomField({ name, label, type = 'text', endAdornment }) {
+  return (
+    <>
+      <Field
+        as={TextField}
+        fullWidth
+        id={name}
+        name={name}
+        label={label}
+        type={type}
+        size="small"
+        InputProps={{ endAdornment }}
+      />
+      <ErrorMessage name={name} component="div" className="text-xs text-[red]" />
+    </>
   );
 }
 
 function SubmitButton() {
   const { isValidating, isValid } = useFormikContext();
   return (
-    <Button
-      variant="contained"
-      type="submit"
-      className="w-full mb-2 bg-milk"
-      disabled={!isValid || isValidating}
-    >
+    <Button variant="contained" type="submit" fullWidth disabled={!isValid || isValidating}>
       Зарегистрироваться
     </Button>
   );
 }
 
 const validateForm = (values) => {
-  const errors: Partial<FormikValues> = {};
-
-  if (!values.email) {
-    errors.email = 'Обязательное поле';
-  } else if (!/^\S+@\S+\.\S+$/.test(values.email)) {
-    errors.email = 'Неправильный формат email';
-  }
-
-  if (!values.firstName) {
-    errors.firstName = 'Обязательное поле';
-  }
-
-  if (!values.lastName) {
-    errors.lastName = 'Обязательное поле';
-  }
-
-  if (!values.password) {
-    errors.password = 'Обязательное поле';
-  } else if (values.password.length < 6) {
-    errors.password = 'Пароль должен содержать минимум 6 символов';
-  }
-
-  if (!values.rePassword) {
-    errors.rePassword = 'Обязательное поле';
-  } else if (values.password !== values.rePassword) {
-    errors.rePassword = 'Пароли не совпадают';
-  }
-
-  if (!values.birthdate) {
-    errors.birthdate = 'Обязательное поле';
-  }
-
+  const errors = {};
+  if (!values.email) errors.email = 'Обязательное поле';
+  if (!values.firstName) errors.firstName = 'Обязательное поле';
+  if (!values.lastName) errors.lastName = 'Обязательное поле';
+  if (!values.password || values.password.length < 6) errors.password = 'Пароль должен содержать минимум 6 символов';
+  if (values.password !== values.rePassword) errors.rePassword = 'Пароли не совпадают';
+  if (!values.birthdate) errors.birthdate = 'Обязательное поле';
+  if (!values.phoneModels.length) errors.phoneModels = 'Выберите хотя бы одну модель';
   return errors;
 };
 
-export const RegisterPage = withErrorBoundary(Page, {
+export const RegisterPage = withErrorBoundary(RegisterPageComponent, {
   fallbackRender: ({ error }) => <ErrorHandler error={error} />,
 });

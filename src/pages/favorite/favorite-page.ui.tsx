@@ -24,7 +24,7 @@ export function FavoritePage() {
       </Link>
     </div>;
   }
-  
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center gap-4">
@@ -51,9 +51,11 @@ export function FavoritePage() {
       <div className="container mx-auto px-4 py-10">
         <Title className="text-center">Мои избранные товары</Title>
         {productData.data.favoriteProducts.length > 0 ? (
-          productData.data.favoriteProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))
+          <div className=" flex flex-wrap gap-5">
+            {productData.data.favoriteProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         ) : (
           <div className="text-center text-gray-600">
             <p className="mb-4">У вас нет товаров в избранном.</p>

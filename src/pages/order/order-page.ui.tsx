@@ -4,6 +4,7 @@ import { getCookie } from 'typescript-cookie';
 import { Title } from '~shared/ui/title';
 import { productQueries } from '~entities/product';
 
+
 export function OrderPage() {
   const isAuth = getCookie('access');
   const { data: ordersData, isLoading, isError } = productQueries.useGetCart();
@@ -58,15 +59,17 @@ export function OrderPage() {
     createPayment(id);
   };
 
-
   if (isSuccess && paymentData?.data.checkoutUrl) {
     window.location.href = paymentData.data.checkoutUrl; 
     return null; 
   }
 
   return (
-    <div className="min-h-screen w-full p-4 flex flex-col bg-white rounded-lg shadow-md">
-      <Title>Заказ #{id}</Title>
+    <div className="min-h-screen w-full p-6 bg-white rounded-lg shadow-xl max-w-lg mx-auto my-20 border border-[gray]/50">
+      <div className="flex flex-col items-center border-b border-gray-300 pb-4">
+        <Title>Заказ #{id}</Title>
+        <img src="/logo.png" alt="Logo" className="w-24 h-24 mt-4 rounded-full" />
+      </div>
 
       <div className="mt-4 border-b border-gray-300 pb-4">
         <p className="text-lg font-semibold">Статус заказа: <span className="text-violet">{status}</span></p>
@@ -81,7 +84,7 @@ export function OrderPage() {
         <ul className="list-none mt-2">
           {orderItems.map((item, index) => (
             <li key={index} className="flex justify-between py-2 border-b border-gray-200">
-              <span>{`Товар ID: ${item.product}`}</span>
+              <span>{`Товар: ${item.product.name}`}</span>
               <span>{`Количество: ${item.quantity}`}</span>
             </li>
           ))}
@@ -125,6 +128,10 @@ export function OrderPage() {
         {isPaymentError && !isPaid && (
           <p className="mt-4 text-red-500 font-semibold">Ошибка при оплате, попробуйте снова.</p>
         )}
+      </div>
+
+      <div className="mt-6 border-t border-gray-300 pt-4 text-center text-sm text-[gray]">
+        <p>Спасибо за покупку! Мы ценим ваш выбор.</p>
       </div>
     </div>
   );

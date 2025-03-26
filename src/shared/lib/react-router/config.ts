@@ -30,7 +30,7 @@ export const pathKeys = {
     return pathKeys.root.concat('course/');
   },
   loyalty() {
-    return pathKeys.root.concat('loyalty-programs/');
+    return pathKeys.root.concat('loyalty/');
   },
   forgotPassword(){
     return pathKeys.root.concat("forgot-password/")

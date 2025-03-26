@@ -1,6 +1,7 @@
 import {
   editUserProfile,
   emailActivationMutation,
+  getPhoneModels,
   getTokenMutation,
   getUserByUsername,
   loginUserQuery,
@@ -25,6 +26,7 @@ const keys = {
   root: () => ['user'],
   getToken: () => [...keys.root(), 'getToken'] as const,
   loginUser: () => [...keys.root(), 'loginUser'] as const,
+  getModels: () => [...keys.root(), 'models'] as const,
   registerUser: () => [...keys.root(), 'registerUser'] as const,
   user: (username: string) => [...keys.root(), 'username', username] as const,
 };
@@ -207,4 +209,12 @@ export function useGetUserByUsername(username: string) {
     queryKey: keys.user(username),
     queryFn: () => getUserByUsername(username),
   });
+}
+
+
+export function useGetPhoneModels(){
+  return useQuery({
+    queryKey:keys.getModels(),
+    queryFn: getPhoneModels,
+  })
 }

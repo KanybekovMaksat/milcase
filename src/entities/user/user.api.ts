@@ -26,7 +26,7 @@ export function registerUserMutation(params: { user: CreateUserSchema }) {
 }
 
 export function emailActivationMutation(params: { data: ActivationData }) {
-  return $api.post('auth/users/activation/', params.data);
+  return axios.post(`${API}/auth/users/activation/`, params.data);
 }
 
 export function editUserProfile(params: { user: EditUserProfile }) {
@@ -43,4 +43,8 @@ export function resetPasswordEmail(params: { email: SendEmail }) {
 
 export function resetPasswordConfirm(params: { data: UpdatePassword }) {
   return axios.post(`${API}/reset_password_confirm/`, params.data);
+}
+
+export function getPhoneModels(){
+  return axios.get(`${API}/phone-models/`);
 }
