@@ -29,10 +29,10 @@ function BubbleError() {
     console.error('Unknown Route Error:', error);
   }
   return (
-    <div className="text-center text-red-500">
+    <div className="text-center text-red-500 mt-20">
       <h1>404!</h1>
-      <p>Не найдена такая страница</p>
-      <Link className="py-[10px] px-[30px] border bg-blue" to="/">
+      <p className='mb-[10px]'>Не найдена такая страница</p>
+      <Link className="py-[10px]  px-[30px] border bg-blue" to="/">
         Вернуться на главную
       </Link>
     </div>

@@ -24,8 +24,8 @@ export const editUserSchema = z.object({
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
-  photo: z.instanceof(File).optional(),
   birthdate: z.date(),
+  phoneModel:z.number(),
 });
 
 export const ActivationData = z.object({
