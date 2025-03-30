@@ -1,7 +1,7 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Footer } from '~widgets/footer';
 import { Header } from '~widgets/header';
-import { Navigator } from '~widgets/navigator';
+
 
 export function GenericLayout() {
   return (
@@ -17,22 +17,3 @@ export function GenericLayout() {
   );
 }
 
-export function IntroLayout() {
-  return (
-    <div className="h-screen flex items-center justify-center">
-      <Outlet />
-    </div>
-  );
-}
-
-// interface ProtectedRouteProps {
-//   isAuthenticated: boolean;
-//   redirectPath?: string;
-// }
-
-// export function ProtectedRoute({
-//   isAuthenticated,
-//   redirectPath = '/auth',
-// }: ProtectedRouteProps) {
-//   return isAuthenticated ? <Outlet /> : <Navigate to={redirectPath} replace />;
-// }
