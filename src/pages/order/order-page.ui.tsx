@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { getCookie } from 'typescript-cookie';
 import { Title } from '~shared/ui/title';
 import { productQueries } from '~entities/product';
+import { userQueries } from '~entities/user';
 
 
 export function OrderPage() {
   const isAuth = getCookie('access');
   const { data: ordersData, isLoading, isError } = productQueries.useGetCart();
+
   const { mutate: createPayment, isPending, isSuccess, isError: isPaymentError, data: paymentData } = productQueries.useCreatePayment();
 
   if (isLoading) {

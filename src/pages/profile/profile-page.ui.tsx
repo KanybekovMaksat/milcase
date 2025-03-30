@@ -70,15 +70,13 @@ const formattedBirthday = format(new Date('2025-02-06'), 'd MMMM yyyy', {
 
 export function ProfilePage() {
   const [active, setActive] = useState(false);
-
-  const [timeLeft, setTimeLeft] = useState('');
   const navigate = useNavigate();
   const {
     data: userData,
     isLoading,
     isError,
   } = userQueries.useLoginUserQuery();
-  
+
   const {
     data: models,
     isLoading: modelsLoading,
@@ -115,7 +113,13 @@ export function ProfilePage() {
     phoneModel,
   } = userData?.data;
 
-  const [phoneModels, setPhoneModels] = useState<number[]>([phoneModel.id]);
+  const [phoneModels, setPhoneModels] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (userData?.data?.phoneModel?.id) {
+      setPhoneModels([userData.data.phoneModel.id]);
+    }
+  }, [userData]);
 
   const initialUser: userTypes.EditUserProfile = {
     email: email,
@@ -161,7 +165,7 @@ export function ProfilePage() {
                   sx={{ padding: 1, backgroundColor: '#f1f8e9', flex: 1 }}
                 >
                   <Chip
-                    label="4"
+                    label={quantityOfCases}
                     color="primary"
                     className="text-white font-bold"
                     icon={<LoyaltyIcon className="text-alto" />}
@@ -220,7 +224,7 @@ export function ProfilePage() {
             formData.append('email', values.email);
             formData.append('firstName', values.firstName);
             formData.append('lastName', values.lastName);
-            formData.append('phoneModels', phoneModels);
+            formData.append('phoneModel', Number(phoneModels[0])); // Убедимся, что передаём число
             editUser({ user: formData });
           }}
         >
@@ -275,16 +279,18 @@ export function ProfilePage() {
                 <TextField
                   select
                   fullWidth
-                  label="Выберите модели телефонов"
-                  onChange={(event) => setPhoneModels(event.target.value)}
+                  label="Выберите модель телефона"
+                  onChange={(event) =>
+                    setPhoneModels([Number(event.target.value)])
+                  } // Преобразуем в число
                   variant="outlined"
-                  value={phoneModels}
+                  value={phoneModels[0] || ''}
                 >
                   <MenuItem value="" disabled>
                     Выберите модели телефонов
                   </MenuItem>
                   {models?.data?.map((model) => (
-                    <MenuItem key={model.id} value={model.id}>
+                    <MenuItem key={model.id} value={Number(model.id)}>
                       {model.brand} {model.modelName}
                     </MenuItem>
                   ))}

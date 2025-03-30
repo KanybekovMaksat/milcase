@@ -7,9 +7,8 @@ import {
 import { homePageRoute } from '../../pages/home';
 import { profilePageRoute } from '../../pages/profile';
 import { catalogPageRoute } from '../../pages/catalog/catalog-page.route';
-import { GenericLayout, IntroLayout } from '../../pages/layout';
+import { GenericLayout } from '../../pages/layout';
 import { aboutPageRoute } from '~pages/about';
-import { ProtectedRoute } from '~pages/layout/layout.ui';
 import { getCookie } from 'typescript-cookie';
 import { loyaltyPageRoute } from '~pages/loyalty';
 import { loginPageRoute } from '~pages/login';
@@ -23,21 +22,35 @@ import { orderPageRoute } from '~pages/order';
 
 function BubbleError() {
   const error = useRouteError();
+
   if (error instanceof Error) {
     console.error('Route Error:', error.message);
   } else {
     console.error('Unknown Route Error:', error);
   }
+
   return (
-    <div className="text-center text-red-500 mt-20">
-      <h1>404!</h1>
-      <p className='mb-[10px]'>Не найдена такая страница</p>
-      <Link className="py-[10px]  px-[30px] border bg-blue" to="/">
-        Вернуться на главную
-      </Link>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h1 className="text-6xl font-bold text-red-500 mb-4">404</h1>
+        <p className="text-xl mb-4 text-gray-700">
+          Ой, кажется, такая страница не найдена.
+        </p>
+        <p className="text-sm text-gray-500 mb-6">
+          Возможно, ссылка устарела или была удалена.
+        </p>
+        <Link
+          className="inline-block py-3 px-8 text-white bg-violet rounded-lg hover:bg-blue-700 transition duration-300"
+          to="/"
+        >
+          Вернуться на главную
+        </Link>
+      </div>
     </div>
   );
 }
+
+export default BubbleError;
 
 const isAuth = !!getCookie('access');
 

@@ -7,12 +7,15 @@ import { IconButton } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
 import { productQueries } from '~entities/product';
+import { userQueries } from '~entities/user';
 
 export function CartPage() {
   const isAuth = getCookie('access');
   const [cart, setCart] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
+  const [oldTotalPrice, setOldTotalPrice] = useState(0); 
   const { mutate: placeOrder, isPending, isSuccess, isError } = productQueries.useCreateOrder();
+  const {data:userData, isLoading:userLoading, isError:userError} = userQueries.useLoginUserQuery();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,8 +26,13 @@ export function CartPage() {
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    setTotalPrice(total);
-  }, []);
+
+    const discount = userData?.data.birthdayDiscount || 0;
+    const discountedTotal = total * (1 - discount / 100);
+
+    setTotalPrice(discountedTotal);
+    setOldTotalPrice(total); 
+  }, [userData]);
 
   const handleQuantityChange = (id, type) => {
     const updatedCart = { ...cart };
@@ -45,7 +53,12 @@ export function CartPage() {
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    setTotalPrice(total);
+
+    const discount = userData?.data.birthdayDiscount || 0;
+    const discountedTotal = total * (1 - discount / 100);
+
+    setTotalPrice(discountedTotal);
+    setOldTotalPrice(total); 
   };
 
   const handleOrder = () => {
@@ -55,14 +68,14 @@ export function CartPage() {
     }));
 
     if (orderItems.length > 0) {
-      placeOrder(orderItems); 
+      placeOrder(orderItems);
     }
   };
 
   useEffect(() => {
     if (isSuccess) {
-      localStorage.removeItem('CARTStorage'); 
-      navigate('/order'); 
+      localStorage.removeItem('CARTStorage');
+      navigate('/order');
     }
   }, [isSuccess, navigate]);
 
@@ -127,8 +140,23 @@ export function CartPage() {
 
           <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
             <p className="text-xl font-bold text-gray-800">
-              Итого: <span className="text-violet">{totalPrice} сом</span>
+              {oldTotalPrice > totalPrice && (
+                <>
+                  <span className="line-through text-gray-500 mr-2">
+                    {oldTotalPrice.toFixed(2)} сом
+                  </span>
+                  <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
+                </>
+              )}
+              {oldTotalPrice === totalPrice && (
+                <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
+              )}
             </p>
+            {userData?.data.birthdayDiscount > 0 && (
+              <p className="text-sm text-gray-500">
+                Скидка в честь дня рождения!
+              </p>
+            )}
             <Button
               variant="contained"
               className="mt-4 bg-violet text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-300 hover:bg-violet-dark"

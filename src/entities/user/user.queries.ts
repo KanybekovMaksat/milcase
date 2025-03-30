@@ -90,7 +90,7 @@ export function useGetTokenMutation() {
       localStorage.removeItem('username');
       localStorage.removeItem('password');
       toast.success('Вы успешно авторизовались!', { autoClose: 500 });
-      navigate(pathKeys.profile.root());
+      navigate(pathKeys.home());
     },
     onError: (error: AxiosErrorType) => {
       const errorMessage = error.response
