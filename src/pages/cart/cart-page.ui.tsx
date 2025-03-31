@@ -255,6 +255,44 @@ export function CartPage() {
     }
   }, [isSuccess, navigate]);
 
+  // useEffect(() => {
+  //   const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+  //   setCart(cartData);
+  //   setFreeCases([]);
+  
+  //   let total = Object.values(cartData).reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  //   // Учёт скидки на день рождения
+  //   const discount = userData?.data.birthdayDiscount || 0;
+  //   total *= 1 - discount / 100;
+  
+  //   // Вычитаем цену бесплатных чехлов
+  //   const freeCasesTotal = Object.values(cartData)
+  //     .filter(item => freeCases.includes(item.id))
+  //     .reduce((sum, item) => sum + item.price, 0);
+  
+  //   setOldTotalPrice(total);
+  //   setTotalPrice(total - freeCasesTotal);
+  // }, [userData, freeCases]); // Теперь пересчитываем при изменении freeCases
+
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+    setCart(cartData);
+  
+    let total = Object.values(cartData).reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    const discount = userData?.data.birthdayDiscount || 0;
+    total *= 1 - discount / 100;
+  
+    const freeCasesTotal = Object.values(cartData)
+      .filter(item => freeCases.includes(item.id))
+      .reduce((sum, item) => sum + item.price, 0);
+  
+    setOldTotalPrice(total);
+    setTotalPrice(total - freeCasesTotal);
+  }, [userData, freeCases]);
+  
+  
   if (!isAuth) {
     return (
       <div className="text-center text-gray-600">
