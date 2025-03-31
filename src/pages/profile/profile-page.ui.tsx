@@ -144,7 +144,7 @@ export function ProfilePage() {
           <div className="mt-5 flex flex-col items-center">
             <div className="flex flex-col gap-4">
               <div className="flex gap-[10px]">
-                <Paper
+                {/* <Paper
                   className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
                   elevation={2}
                   sx={{ padding: 1, backgroundColor: '#e3f2fd' }}
@@ -158,9 +158,9 @@ export function ProfilePage() {
                   <p className="text-[15px] font-bold text-tundora">
                     Накопленные баллы
                   </p>
-                </Paper>
+                </Paper> */}
                 <Paper
-                  className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
+                  className="w-full min-w-[150px] shadow-none border border-alto"
                   elevation={2}
                   sx={{ padding: 1, backgroundColor: '#f1f8e9', flex: 1 }}
                 >

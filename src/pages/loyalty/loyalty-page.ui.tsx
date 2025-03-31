@@ -5,14 +5,14 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 export function LoyaltyPage() {
   const loyaltyPrograms = [
-    {
-      id: 1,
-      title: 'Накопление бонусных баллов',
-      description:
-        'Копите бонусные баллы с каждой покупки! Если сумма чека превышает 800 с, за каждые 100 с вы получаете 1 балл. Например, при покупке на 800 с — 8 баллов. Используйте накопленные баллы для оплаты будущих заказов.',
-      icon: <AttachMoneyIcon fontSize="large" className="text-white" />,
-      bgColor: 'from-violet to-violet/60',
-    },
+    // {
+    //   id: 1,
+    //   title: 'Накопление бонусных баллов',
+    //   description:
+    //     'Копите бонусные баллы с каждой покупки! Если сумма чека превышает 800 с, за каждые 100 с вы получаете 1 балл. Например, при покупке на 800 с — 8 баллов. Используйте накопленные баллы для оплаты будущих заказов.',
+    //   icon: <AttachMoneyIcon fontSize="large" className="text-white" />,
+    //   bgColor: 'from-violet to-violet/60',
+    // },
     {
       id: 2,
       title: 'Скидка 15% на день рождения',

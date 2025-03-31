@@ -4,6 +4,6 @@ import { pathKeys } from '../../shared/lib/react-router';
 import { ProfilePage } from './profile-page.ui';
 
 export const profilePageRoute: RouteObject = {
-  path: pathKeys.profile.root(),
+  path: pathKeys.profile(),
   element: createElement(ProfilePage),
 };
