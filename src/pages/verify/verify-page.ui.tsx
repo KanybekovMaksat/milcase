@@ -30,7 +30,7 @@ export function VerifyPage() {
   }, [isActivationSuccess]);
 
   return (
-    <div className="my-20 w-[400px] bg-[white] mx-auto rounded-md px-5 py-7 border border-sc-100 flex flex-col gap-3">
+    <div className="my-20 w-[400px] bg-[white] mx-auto rounded-md px-5 py-7 border border-sc-100 flex flex-col items-center gap-3">
       <p className="text-center text-lg font-medium">Активация вашего email</p>
       {isActivationPending && <CircularProgress />}
       {isLoginPending && <CircularProgress />}

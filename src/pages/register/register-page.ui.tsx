@@ -1,16 +1,10 @@
+import { Formik, Form, ErrorMessage, useFormikContext, Field } from 'formik';
 import {
-  Formik,
-  Form,
-  ErrorMessage,
-  useFormikContext,
-  Field,
-} from 'formik';
-import {
-  Box,
   Button,
   IconButton,
   TextField,
   MenuItem,
+  CircularProgress,
 } from '@mui/material';
 import { useState } from 'react';
 import { withErrorBoundary } from 'react-error-boundary';
@@ -31,12 +25,39 @@ function RegisterPageComponent() {
   const [visibility, setVisibility] = useState(false);
   const handleClickShowPassword = () => setVisibility((prev) => !prev);
 
-  const { mutate: registerUser, isPending, isSuccess } = userQueries.useRegisterMutation();
+  const {
+    mutate: registerUser,
+    isPending,
+    isSuccess,
+  } = userQueries.useRegisterMutation();
   const { data: models, isLoading, isError } = userQueries.useGetPhoneModels();
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error loading phone models...</p>;
-  if (isSuccess) return <p>На вашу почту отправлено письмо для подтверждения.</p>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-500">Загрузка...</p>
+      </div>
+    );
+
+  if (isError)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-red-500">
+          Ошибка загрузки моделей телефонов...
+        </p>
+      </div>
+    );
+
+  if (isSuccess)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-green-100 text-green-800 px-6 py-4 rounded-md shadow-md">
+          <p className="text-lg font-semibold">
+            На вашу почту отправлено письмо для подтверждения.
+          </p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="w-[380px] mx-auto rounded-md px-5 py-7">
@@ -45,33 +66,44 @@ function RegisterPageComponent() {
         initialValues={initialUser}
         validate={validateForm}
         onSubmit={(user) => registerUser({ user })}
+        validateOnMount={true}
       >
         {({ values, setFieldValue }) => (
-          <Form className="flex flex-col gap-[20px]">
+          <Form className="flex flex-col ">
             <CustomField name="email" label="Email" type="email" />
             <CustomField name="firstName" label="Имя" />
             <CustomField name="lastName" label="Фамилия" />
-            <CustomField name="birthdate" label="Дата рождения" type="date" />
-            <CustomField name="password" label="Введите пароль" type={visibility ? 'text' : 'password'}
+            <div>
+              <p className="text-sm">День рождения</p>
+              <CustomField name="birthdate" type="date" />
+            </div>
+            <CustomField
+              name="password"
+              label="Введите пароль"
+              type={visibility ? 'text' : 'password'}
               endAdornment={
                 <IconButton onClick={handleClickShowPassword}>
                   {visibility ? '🙈' : '👁️'}
                 </IconButton>
               }
             />
-            <CustomField name="rePassword" label="Подтвердите пароль" type={visibility ? 'text' : 'password'} />
-
+            <CustomField
+              name="rePassword"
+              label="Подтвердите пароль"
+              type={visibility ? 'text' : 'password'}
+            />
             <TextField
               select
               fullWidth
-              label="Выберите модели телефонов"
-              value={values.phoneModels || []}
-              onChange={(event) => setFieldValue('phoneModels', event.target.value)}
-              SelectProps={{ multiple: true }}
+              label="Выберите модель телефона"
+              value={values.phoneModels.length > 0 ? values.phoneModels[0] : ''}
+              onChange={(event) =>
+                setFieldValue('phoneModels', [event.target.value])
+              }
               variant="outlined"
             >
               <MenuItem value="" disabled>
-                Выберите модели телефонов
+                Выберите модель телефона
               </MenuItem>
               {models?.data?.map((model) => (
                 <MenuItem key={model.id} value={model.id}>
@@ -79,9 +111,19 @@ function RegisterPageComponent() {
                 </MenuItem>
               ))}
             </TextField>
-            <ErrorMessage name="phoneModels" component="div" className="text-xs text-[red]" />
-
-            <SubmitButton />
+            <ErrorMessage
+              name="phoneModels"
+              component="div"
+              className="text-xs text-[red]"
+            />
+            {!isPending ? (
+              <SubmitButton />
+            ) : (
+              <div className="flex justify-center gap-2 border mt-3 items-center p-2 border-[gray]/50 rounded">
+                <CircularProgress className="h-[20px] text-[gray]" />
+                <p className="text-[gray]">Отправка данных...</p>
+              </div>
+            )}
           </Form>
         )}
       </Formik>
@@ -91,7 +133,7 @@ function RegisterPageComponent() {
 
 function CustomField({ name, label, type = 'text', endAdornment }) {
   return (
-    <>
+    <div className="mb-4">
       <Field
         as={TextField}
         fullWidth
@@ -102,15 +144,25 @@ function CustomField({ name, label, type = 'text', endAdornment }) {
         size="small"
         InputProps={{ endAdornment }}
       />
-      <ErrorMessage name={name} component="div" className="text-xs text-[red]" />
-    </>
+      <ErrorMessage
+        name={name}
+        component="div"
+        className="text-xs text-[red]"
+      />
+    </div>
   );
 }
 
 function SubmitButton() {
   const { isValidating, isValid } = useFormikContext();
   return (
-    <Button variant="contained" type="submit" fullWidth disabled={!isValid || isValidating}>
+    <Button
+      className="mt-3"
+      variant="contained"
+      type="submit"
+      fullWidth
+      disabled={!isValid}
+    >
       Зарегистрироваться
     </Button>
   );
@@ -121,10 +173,13 @@ const validateForm = (values) => {
   if (!values.email) errors.email = 'Обязательное поле';
   if (!values.firstName) errors.firstName = 'Обязательное поле';
   if (!values.lastName) errors.lastName = 'Обязательное поле';
-  if (!values.password || values.password.length < 6) errors.password = 'Пароль должен содержать минимум 6 символов';
-  if (values.password !== values.rePassword) errors.rePassword = 'Пароли не совпадают';
+  if (!values.password || values.password.length < 6)
+    errors.password = 'Пароль должен содержать минимум 6 символов';
+  if (values.password !== values.rePassword)
+    errors.rePassword = 'Пароли не совпадают';
   if (!values.birthdate) errors.birthdate = 'Обязательное поле';
-  if (!values.phoneModels.length) errors.phoneModels = 'Выберите хотя бы одну модель';
+  if (!values.phoneModels.length)
+    errors.phoneModels = 'Выберите хотя бы одну модель';
   return errors;
 };
 

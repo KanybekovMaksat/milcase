@@ -1,14 +1,12 @@
 import {
-  Avatar,
   Typography,
   Paper,
   Chip,
   Button,
   TextField,
   MenuItem,
+  CircularProgress,
 } from '@mui/material';
-import { userQueries, userTypes } from '~entities/user';
-import TollIcon from '@mui/icons-material/Toll';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import LinearProgress, {
   LinearProgressProps,
@@ -18,13 +16,11 @@ import { useEffect, useState } from 'react';
 import { removeCookie } from 'typescript-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import { pathKeys } from '~shared/lib/react-router';
-import CakeIcon from '@mui/icons-material/Cake';
-import { parse, differenceInDays, format } from 'date-fns'; // Импортируем функции из date-fns
-import { ru } from 'date-fns/locale';
 import { ModalPopup } from '~widgets/modal-popup';
 import EditIcon from '@mui/icons-material/Edit';
 import OrderHistory from './OrderHistory';
 import FreeCases from './FreeCases';
+import $api from '../../shared/api/index';
 
 import {
   ErrorMessage,
@@ -34,6 +30,8 @@ import {
   FormikValues,
   useFormikContext,
 } from 'formik';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function LinearProgressWithLabel(
   props: LinearProgressProps & { value: number }
@@ -52,56 +50,55 @@ function LinearProgressWithLabel(
   );
 }
 
-const getNextBirthday = (birthdate) => {
-  const currentYear = new Date().getFullYear();
-  const parsedBirthday = parse(birthdate, 'yyyy-MM-dd', new Date());
-  const nextBirthday = new Date(parsedBirthday.setFullYear(currentYear));
+const API = 'https://milcase.makalabox.com/api';
 
-  if (nextBirthday < new Date()) {
-    nextBirthday.setFullYear(currentYear + 1);
-  }
-
-  return nextBirthday;
-};
-
-const formattedBirthday = format(new Date('2025-02-06'), 'd MMMM yyyy', {
-  locale: ru,
-});
-
+export async function editUserProfile(params) {
+  return $api.patch('users/me/', params);
+}
 export function ProfilePage() {
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
-  const {
-    data: userData,
-    isLoading,
-    isError,
-  } = userQueries.useLoginUserQuery();
+  const [userData, setUserData] = useState(null);
+  const [phoneModels, setPhoneModels] = useState<number[]>([]);
+  const [models, setModels] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isPending, setIsPending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const {
-    data: models,
-    isLoading: modelsLoading,
-    isError: modelsError,
-  } = userQueries.useGetPhoneModels();
-  const {
-    mutate: editUser,
-    isPending,
-    isError: isEditError,
-    isSuccess: isEditSucces,
-  } = userQueries.useEditUserProfile();
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const response = await $api.get('users/me');
+        const modelsResponse = await axios.get(`${API}/phone-models/`);
+        setModels(modelsResponse.data);
+        setUserData(response.data);
+      } catch (err) {
+        setError('Ошибка загрузки данных');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserData();
+  }, []);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress color="primary" />
+      </div>
+    );
+
+  if (error)
+    return <div className="text-red-500 text-center mt-10">{error}</div>;
 
   const handleLogout = () => {
     removeCookie('access');
     localStorage.removeItem('refreshMilcase');
     navigate(`${pathKeys.home()}`);
-    userQueries.userService.removeCache();
   };
 
-  if (isLoading || !userData?.data || modelsLoading)
-    return <div>Loading...</div>;
-
-  if (isError || modelsError) return <div>Error fetching user data.</div>;
-
-  const birthdate = userData?.data?.birthdate;
+  const birthdate = userData.birthdate;
 
   const {
     email,
@@ -111,20 +108,41 @@ export function ProfilePage() {
     quantityOfCases,
     freeCases,
     phoneModel,
-  } = userData?.data;
+  } = userData;
 
-  const [phoneModels, setPhoneModels] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (userData?.data?.phoneModel?.id) {
-      setPhoneModels([userData.data.phoneModel.id]);
-    }
-  }, [userData]);
-
-  const initialUser: userTypes.EditUserProfile = {
+  const initialUser = {
     email: email,
     firstName: firstName,
     lastName: lastName,
+  };
+
+  const handleEditProfile = async (values) => {
+    setIsPending(true);
+    setIsSuccess(false);
+    try {
+      await editUserProfile(values);
+      const response = await $api.get('users/me'); // Обновляем данные после редактирования
+      setUserData(response.data);
+      setActive(false);
+      setIsSuccess(true);
+
+      toast.success('Профиль успешно обновлён!', {
+        position: 'top-right',
+        autoClose: 3000, // Закрывается через 3 секунды
+      });
+
+      setTimeout(() => {
+        setIsSuccess(false); // Сброс флага через время
+      }, 3000);
+    } catch (err) {
+      toast.error('Ошибка при обновлении профиля!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+      console.error('Ошибка обновления профиля', err);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -137,35 +155,19 @@ export function ProfilePage() {
         <div>
           <div className="flex flex-col items-center">
             <Typography variant="h6" className="text-center">
-              {userData.data.firstName} {userData.data.lastName}
+              {userData.firstName} {userData.lastName}
             </Typography>
           </div>
-
           <div className="mt-5 flex flex-col items-center">
             <div className="flex flex-col gap-4">
               <div className="flex gap-[10px]">
-                {/* <Paper
-                  className="max-w-[150px] min-w-[150px] shadow-none border border-alto"
-                  elevation={2}
-                  sx={{ padding: 1, backgroundColor: '#e3f2fd' }}
-                >
-                  <Chip
-                    label={points}
-                    color="primary"
-                    className="text-white font-bold"
-                    icon={<TollIcon className="text-alto" />}
-                  />
-                  <p className="text-[15px] font-bold text-tundora">
-                    Накопленные баллы
-                  </p>
-                </Paper> */}
                 <Paper
                   className="w-full min-w-[150px] shadow-none border border-alto"
                   elevation={2}
                   sx={{ padding: 1, backgroundColor: '#f1f8e9', flex: 1 }}
                 >
                   <Chip
-                    label={quantityOfCases}
+                    label={userData.quantityOfCases}
                     color="primary"
                     className="text-white font-bold"
                     icon={<LoyaltyIcon className="text-alto" />}
@@ -174,7 +176,7 @@ export function ProfilePage() {
                     Куплено чехлов
                   </p>
                   <LinearProgressWithLabel
-                    value={Math.floor((quantityOfCases / 7) * 100)}
+                    value={Math.floor((userData.quantityOfCases / 7) * 100)}
                   />
                 </Paper>
               </div>
@@ -187,8 +189,8 @@ export function ProfilePage() {
                   Модель телефона
                 </p>
                 <p className="text-violet font-bold">
-                  {phoneModel.brand}
-                  {phoneModel.modelName}
+                  {userData.phoneModel?.brand}
+                  {userData.phoneModel?.modelName}
                 </p>
               </Paper>
               <Link className="text-violet underline" to={pathKeys.loyalty()}>
@@ -213,24 +215,27 @@ export function ProfilePage() {
           </div>
         </div>
       </Paper>
-      <FreeCases count={freeCases} />
+      <FreeCases count={userData.freeCases} />
       <OrderHistory />
       <ModalPopup active={active} setActive={setActive}>
         <Formik
           initialValues={initialUser}
           validate={validateForm}
           onSubmit={(values) => {
-            const formData = new FormData();
-            formData.append('email', values.email);
-            formData.append('firstName', values.firstName);
-            formData.append('lastName', values.lastName);
-            formData.append('phoneModel', Number(phoneModels[0])); // Убедимся, что передаём число
-            editUser({ user: formData });
+            handleEditProfile({
+              email: values.email,
+              firstName: values.firstName,
+              lastName: values.lastName,
+              phoneModel:
+                phoneModels.length > 0
+                  ? Number(phoneModels[0])
+                  : userData.phoneModel?.id,
+            });
           }}
         >
           {({ setFieldValue }) => (
             <Form>
-              <fieldset disabled={isPending}>
+              <fieldset>
                 <fieldset className="my-5">
                   <Field
                     as={TextField}
@@ -282,27 +287,21 @@ export function ProfilePage() {
                   label="Выберите модель телефона"
                   onChange={(event) =>
                     setPhoneModels([Number(event.target.value)])
-                  } // Преобразуем в число
+                  }
                   variant="outlined"
                   value={phoneModels[0] || ''}
                 >
                   <MenuItem value="" disabled>
                     Выберите модели телефонов
                   </MenuItem>
-                  {models?.data?.map((model) => (
+                  {models?.map((model) => (
                     <MenuItem key={model.id} value={Number(model.id)}>
-                      {model.brand} {model.modelName}
+                      {model?.brand} {model?.modelName}
                     </MenuItem>
                   ))}
                 </TextField>
               </fieldset>
-              {isPending ? (
-                <div className="w-full mb-2 min-h-[40px]">
-                  <LinearProgress />
-                </div>
-              ) : (
-                <SubmitButton />
-              )}
+              <SubmitButton isPending={isPending} />
             </Form>
           )}
         </Formik>
@@ -311,16 +310,16 @@ export function ProfilePage() {
   );
 }
 
-function SubmitButton() {
+function SubmitButton({ isPending }) {
   const { isValidating, isValid } = useFormikContext();
   return (
     <Button
       variant="contained"
       type="submit"
       className="w-full mb-2 bg-second-100 shadow-none"
-      disabled={!isValid || isValidating}
+      disabled={!isValid || isValidating || isPending}
     >
-      Редактировать
+      {isPending ? <CircularProgress size={20} /> : 'Редактировать'}
     </Button>
   );
 }
