@@ -27,14 +27,12 @@ export function CatalogPage() {
     isError: isCategoryError,
   } = productQueries.useGetCategories();
 
-
-
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  if (isLoading && isCategoryLoading) {
+  if (isLoading || isCategoryLoading) {
     return (
       <div className="flex flex-col items-center gap-4">
         <CircularProgress className="text-milk w-10 h-10" />
@@ -45,7 +43,7 @@ export function CatalogPage() {
     );
   }
 
-  if (isError && isCategoryError) {
+  if (isError || isCategoryError) {
     return (
       <div className="flex flex-col items-center gap-4">
         <h3 className="text-milk font-semibold text-lg opacity-75">
@@ -56,27 +54,30 @@ export function CatalogPage() {
   }
 
   const handleCategoryChange = (category) => {
-    if (selectedCategories.includes(category.id)) {
-      setSelectedCategories(
-        selectedCategories.filter((id) => id !== category.id)
-      );
-    } else {
-      const allCategoryIds = [
-        category.id,
-        ...category.children.map((child) => child.id),
-      ];
-      setSelectedCategories([...selectedCategories, ...allCategoryIds]);
-    }
+    const allCategoryIds = [category.id, ...category.children.map((child) => child.id)];
+    const newSelected = new Set(selectedCategories);
+    allCategoryIds.forEach((id) => {
+      if (newSelected.has(id)) {
+        newSelected.delete(id);
+      } else {
+        newSelected.add(id);
+      }
+    });
+    setSelectedCategories([...newSelected]);
   };
 
-  const filteredProducts =
-    productData?.data?.results.filter(
-      (product) =>
-        (searchQuery === '' ||
-          product.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-        (selectedCategories.length === 0 ||
-          selectedCategories.includes(product.category.id))
-    ) || [];
+  const filteredProducts = productData?.data?.results.filter((product) => {
+    const matchesSearch =
+      searchQuery === '' ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const productCategoryIds = product.category.map((cat) => cat.id);
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      productCategoryIds.some((id) => selectedCategories.includes(id));
+
+    return matchesSearch && matchesCategory;
+  }) || [];
 
   return (
     <div className="min-h-screen w-full p-4">
@@ -96,97 +97,49 @@ export function CatalogPage() {
             ),
           }}
         />
-        <IconButton
-          className="ml-2 md:hidden"
-          onClick={() => setIsFilterOpen(true)}
-        >
+        <IconButton className="ml-2 md:hidden" onClick={() => setIsFilterOpen(true)}>
           <FilterList />
         </IconButton>
       </div>
 
-      <Drawer
-        anchor="left"
-        open={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-      >
+      {/* Drawer Filter for Mobile */}
+      <Drawer anchor="left" open={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
         <div style={{ width: 300, padding: '4px' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '0px 10px',
-              paddingTop: '20px',
-            }}
-          >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0px 10px', paddingTop: '20px' }}>
             <h3 style={{ fontWeight: 'bold' }}>Фильтр</h3>
             <IconButton onClick={() => setIsFilterOpen(false)}>
               <Close />
             </IconButton>
           </div>
-
           {categoriesData?.data.map((category) => (
             <div key={category.id}>
               <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                  padding: '5px 0px',
-                  paddingRight: '30px',
-                  paddingLeft: '10px',
-                }}
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === category.id ? null : category.id
-                  )
-                }
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', padding: '5px 10px' }}
+                onClick={() => setOpenDropdown(openDropdown === category.id ? null : category.id)}
               >
                 <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedCategories.includes(category.id)}
-                      onChange={() => handleCategoryChange(category)}
-                    />
-                  }
+                  control={<Checkbox checked={selectedCategories.includes(category.id)} onChange={() => handleCategoryChange(category)} />}
                   label={category.name}
                 />
                 <ExpandMore
                   style={{
-                    transform:
-                      openDropdown === category.id
-                        ? 'rotate(180deg)'
-                        : 'rotate(0deg)',
+                    transform: openDropdown === category.id ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.3s ease',
                   }}
                 />
               </div>
               {openDropdown === category.id && (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    paddingLeft: '25px',
-                  }}
-                >
+                <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '25px' }}>
                   {category.children.length > 0 ? (
                     category.children.map((child) => (
                       <FormControlLabel
                         key={child.id}
-                        control={
-                          <Checkbox
-                            checked={selectedCategories.includes(child.id)}
-                            onChange={() => handleCategoryChange(child)}
-                          />
-                        }
+                        control={<Checkbox checked={selectedCategories.includes(child.id)} onChange={() => handleCategoryChange(child)} />}
                         label={child.name}
                       />
                     ))
                   ) : (
-                    <p style={{ padding: '0px 0px 20px 25px', color: 'gray' }}>
-                      Нет подкатегорий
-                    </p>
+                    <p style={{ padding: '0px 0px 20px 25px', color: 'gray' }}>Нет подкатегорий</p>
                   )}
                 </div>
               )}
@@ -194,12 +147,7 @@ export function CatalogPage() {
           ))}
 
           <Button
-            style={{
-              background: '#8f95cd',
-              boxShadow: 'none',
-              width: '85%',
-              marginTop: '40px',
-            }}
+            style={{ background: '#8f95cd', boxShadow: 'none', width: '85%', marginTop: '40px' }}
             variant="contained"
             onClick={() => setSelectedCategories([])}
           >
@@ -209,31 +157,16 @@ export function CatalogPage() {
       </Drawer>
 
       <div className="flex flex-col md:flex-row md:justify-between gap-[50px] mt-10 items-start">
+        {/* Desktop Filters */}
         <div className="hidden md:block w-64 p-4 bg-white shadow-md rounded-lg flex-grow-0 max-h-screen overflow-auto">
           {categoriesData?.data.map((category) => (
             <div key={category.id}>
-              <div
-                className="flex items-center justify-between cursor-pointer py-2"
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === category.id ? null : category.id
-                  )
-                }
-              >
+              <div className="flex items-center justify-between cursor-pointer py-2" onClick={() => setOpenDropdown(openDropdown === category.id ? null : category.id)}>
                 <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedCategories.includes(category.id)}
-                      onChange={() => handleCategoryChange(category)}
-                    />
-                  }
+                  control={<Checkbox checked={selectedCategories.includes(category.id)} onChange={() => handleCategoryChange(category)} />}
                   label={category.name}
                 />
-                <ExpandMore
-                  className={`transition-transform ${
-                    openDropdown === category.id ? 'rotate-180' : ''
-                  }`}
-                />
+                <ExpandMore className={`transition-transform ${openDropdown === category.id ? 'rotate-180' : ''}`} />
               </div>
               {openDropdown === category.id && (
                 <div className="pl-4">
@@ -241,12 +174,7 @@ export function CatalogPage() {
                     category.children.map((child) => (
                       <FormControlLabel
                         key={child.id}
-                        control={
-                          <Checkbox
-                            checked={selectedCategories.includes(child.id)}
-                            onChange={() => handleCategoryChange(child)}
-                          />
-                        }
+                        control={<Checkbox checked={selectedCategories.includes(child.id)} onChange={() => handleCategoryChange(child)} />}
                         label={child.name}
                       />
                     ))
@@ -258,95 +186,19 @@ export function CatalogPage() {
             </div>
           ))}
 
-          <Button
-            className="bg-violet shadow-none w-full mt-4"
-            variant="contained"
-            onClick={() => setSelectedCategories([])}
-          >
+          <Button className="bg-violet shadow-none w-full mt-4" variant="contained" onClick={() => setSelectedCategories([])}>
             Сбросить фильтры
           </Button>
         </div>
 
         <div className="md:w-[900px] flex flex-wrap gap-[10px]">
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
+            filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)
           ) : (
-            <p className="text-gray-500">
-              Нет товаров, соответствующих фильтрам.
-            </p>
+            <p className="text-gray-500">Нет товаров, соответствующих фильтрам.</p>
           )}
         </div>
       </div>
-
-      {/* <div className="flex flex-col md:flex-row md:justify-between gap-[50px] mt-10">
-        <div className="hidden md:block w-64 p-4 bg-white shadow-md rounded-lg">
-          {categoriesData?.data.map((category) => (
-            <div key={category.id}>
-              <div
-                className="flex items-center justify-between cursor-pointer py-2"
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === category.id ? null : category.id
-                  )
-                }
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedCategories.includes(category.id)}
-                      onChange={() => handleCategoryChange(category)}
-                    />
-                  }
-                  label={category.name}
-                />
-                <ExpandMore
-                  className={`transition-transform ${
-                    openDropdown === category.id ? 'rotate-180' : ''
-                  }`}
-                />
-              </div>
-              {openDropdown === category.id && (
-                <div className="pl-4">
-                  {category.children.map((child) => (
-                    <FormControlLabel
-                      key={child.id}
-                      control={
-                        <Checkbox
-                          checked={selectedCategories.includes(child.id)}
-                          onChange={() => handleCategoryChange(child)}
-                        />
-                      }
-                      label={child.name}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-
-          <Button
-            className="bg-violet shadow-none w-full mt-4"
-            variant="contained"
-            onClick={() => setSelectedCategories([])}
-          >
-            Сбросить фильтры
-          </Button>
-        </div>
-
-        <div className="md:w-[900px] flex flex-wrap gap-[10px]">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <p className="text-gray-500">
-              Нет товаров, соответствующих фильтрам.
-            </p>
-          )}
-        </div>
-      </div> */}
     </div>
   );
 }
