@@ -101,8 +101,6 @@ export function CatalogPage() {
           <FilterList />
         </IconButton>
       </div>
-
-      {/* Drawer Filter for Mobile */}
       <Drawer anchor="left" open={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
         <div style={{ width: 300, padding: '4px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0px 10px', paddingTop: '20px' }}>
@@ -157,7 +155,6 @@ export function CatalogPage() {
       </Drawer>
 
       <div className="flex flex-col md:flex-row md:justify-between gap-[50px] mt-10 items-start">
-        {/* Desktop Filters */}
         <div className="hidden md:block w-64 p-4 bg-white shadow-md rounded-lg flex-grow-0 max-h-screen overflow-auto">
           {categoriesData?.data.map((category) => (
             <div key={category.id}>

@@ -1,3 +1,4 @@
+import { get } from 'http';
 import {
   createOrder,
   createPayment,
@@ -7,6 +8,7 @@ import {
   getFavoriteProduct,
   getFavorites,
   getProducts,
+  getReccommndedProducts,
 } from './product.api';
 import {
   useQuery,
@@ -26,6 +28,8 @@ const keys = {
   getFavoriteProducts: () => [...keys.root(), 'fav'] as const,
   getCategories: () => [...keys.category(), 'categories'] as const,
   favProduct: (id: number) => [...keys.root(), 'favorite', id] as const,
+  getReccommndedProducts: () =>
+    [...keys.root(), 'recommended'] as const,
 };
 
 export function useGetProducts() {
@@ -96,5 +100,13 @@ export function useCreatePayment() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: keys.cart() });
     },
+  });
+}
+
+
+export function useGetReccommndedProducts() {
+  return useQuery({
+    queryKey: keys.getReccommndedProducts(),
+    queryFn: getReccommndedProducts
   });
 }

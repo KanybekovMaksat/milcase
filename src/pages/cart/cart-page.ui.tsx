@@ -182,6 +182,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
 import { productQueries } from '~entities/product';
 import { userQueries } from '~entities/user';
+import { WelcomeDiscount } from '~widgets/welcome-discount';
 
 export function CartPage() {
   const isAuth = getCookie('access');
@@ -196,28 +197,32 @@ export function CartPage() {
   } = productQueries.useCreateOrder();
   const { data: userData } = userQueries.useLoginUserQuery();
   const navigate = useNavigate();
+  const showBanner = userData?.data?.cluster === 'K4';
 
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
     setCart(cartData);
 
-    let total = Object.values(cartData).reduce(
+    let baseTotal = Object.values(cartData).reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    const discount = userData?.data.birthdayDiscount || 0;
-    total *= 1 - discount / 100;
+
+    const birthdayDiscount = userData?.data.birthdayDiscount || 0;
+    const welcomeDiscount =
+      userData?.data.cluster === 'K4' ? userData?.data.welcomeDiscount || 0 : 0;
+
+    // Суммарная скидка, но максимум 100% не допускаем
+    const totalDiscount = Math.min(birthdayDiscount + welcomeDiscount, 100);
+
+    const discountedTotal = baseTotal * (1 - totalDiscount / 100);
 
     const freeCasesTotal = Object.values(cartData)
       .filter((item) => freeCases.includes(item.id))
       .reduce((sum, item) => sum + item.price, 0);
 
-    setOldTotalPrice(
-      userData?.data.birthdayDiscount
-        ? total / (1 - userData.data.birthdayDiscount / 100)
-        : total
-    );
-    setTotalPrice(total - freeCasesTotal);
+    setOldTotalPrice(baseTotal);
+    setTotalPrice(discountedTotal - freeCasesTotal);
   }, [userData, freeCases]);
 
   const handleQuantityChange = (id, type) => {
@@ -330,47 +335,56 @@ export function CartPage() {
               </div>
             ))}
           </div>
-          <div className='flex justify-between'>
-          <p className="mt-4 text-gray-600 text-lg font-medium flex items-center gap-2">
-            🎁 Доступно бесплатных чехлов:
-            <span className="text-violet font-bold ">
-              {userData?.data.freeCases
-                ? Math.max(userData.data.freeCases - freeCases.length, 0)
-                : 0}
-            </span>
-          </p>
+          <div className="flex justify-between">
+            <p className="mt-4 text-gray-600 text-lg font-medium flex items-center gap-2">
+              🎁 Доступно бесплатных чехлов:
+              <span className="text-violet font-bold ">
+                {userData?.data.freeCases
+                  ? Math.max(userData.data.freeCases - freeCases.length, 0)
+                  : 0}
+              </span>
+            </p>
 
-          <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
-            <p className="text-xl font-bold text-gray-800">
-              {oldTotalPrice > totalPrice && (
-                <>
-                  <span className="line-through text-gray-500 mr-2">
-                    {oldTotalPrice.toFixed(2)} сом
-                  </span>
+            <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
+              <p className="text-xl font-bold text-gray-800">
+                {oldTotalPrice > totalPrice && (
+                  <>
+                    <span className="line-through text-gray-500 mr-2">
+                      {oldTotalPrice.toFixed(2)} сом
+                    </span>
+                    <span className="text-violet">
+                      {totalPrice.toFixed(2)} сом
+                    </span>
+                  </>
+                )}
+                {userData?.data.birthdayDiscount > 0 && (
+                  <p className="text-sm text-violet text-end">
+                    Скидка в честь дня рождения!
+                  </p>
+                )}
+                {userData.data.cluster === 'K4' &&
+                  userData?.data.welcomeDiscount > 0 &&
+                  userData?.data.cluster === 'K4' && (
+                    <p className="text-sm text-violet text-end">
+                      Скидка в {userData.data.welcomeDiscount}%
+                    </p>
+                  )}
+                {oldTotalPrice === totalPrice && (
                   <span className="text-violet">
                     {totalPrice.toFixed(2)} сом
                   </span>
-                </>
-              )}
-              {userData?.data.birthdayDiscount > 0 && (
-                <p className="text-sm text-violet text-end">
-                  Скидка в честь дня рождения!
-                </p>
-              )}
-              {oldTotalPrice === totalPrice && (
-                <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
-              )}
-            </p>
+                )}
+              </p>
+            </div>
           </div>
-          </div>
-            <Button
-              variant="contained"
-              className="mt-4 bg-violet shadow-none text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-300 hover:bg-violet-dark"
-              onClick={handleOrder}
-              fullWidth
-            >
-              {isPending ? <CircularProgress size={24} /> : 'Оформить заказ'}
-            </Button>
+          <Button
+            variant="contained"
+            className="mt-4 bg-violet shadow-none text-white font-semibold px-6 py-3 rounded-lg  transition-all duration-300 hover:bg-violet-dark"
+            onClick={handleOrder}
+            fullWidth
+          >
+            {isPending ? <CircularProgress size={24} /> : 'Оформить заказ'}
+          </Button>
         </>
       )}
     </div>
