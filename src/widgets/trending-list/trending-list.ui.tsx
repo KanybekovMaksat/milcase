@@ -37,7 +37,7 @@ export const TrendingList = () => {
   }
 
   return (
-    <section className="mb-12 w-full">
+    <section className="mb-12 w-full md:max-w-7xl px-4">
       <div className="relative rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-milk to-violet opacity-90"></div>
         <div className="relative z-10 px-8 py-12 text-white">
