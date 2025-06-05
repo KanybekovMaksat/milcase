@@ -179,6 +179,7 @@ import { getCookie } from 'typescript-cookie';
 import { Title } from '~shared/ui/title';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
+import { productQueries } from '~entities/product';
 import { userQueries } from '~entities/user';
 
 export function CartPage() {
@@ -187,33 +188,47 @@ export function CartPage() {
   const [totalPrice, setTotalPrice] = useState(0);
   const [oldTotalPrice, setOldTotalPrice] = useState(0);
   const [freeCases, setFreeCases] = useState([]);
+
+  const {
+    mutate: placeOrder,
+    isPending,
+    isSuccess,
+  } = productQueries.useCreateOrder();
+
   const { data: userData } = userQueries.useLoginUserQuery();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
-    setCart(cartData);
+    const storedCart = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+    setCart(storedCart);
+  }, []);
 
-    let baseTotal = Object.values(cartData).reduce(
+  useEffect(() => {
+    if (userData) {
+      updateTotal(cart, userData, freeCases);
+    }
+  }, [cart, userData, freeCases]);
+
+  const updateTotal = (cartData, user, freeCasesList) => {
+    const baseTotal = Object.values(cartData).reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
 
-    const birthdayDiscount = userData?.data.birthdayDiscount || 0;
+    const birthdayDiscount = user?.data?.birthdayDiscount || 0;
     const welcomeDiscount =
-      userData?.data.cluster === 'K4' ? userData?.data.welcomeDiscount || 0 : 0;
+      user?.data?.cluster === 'K4' ? user?.data?.welcomeDiscount || 0 : 0;
 
     const totalDiscount = Math.min(birthdayDiscount + welcomeDiscount, 100);
-
     const discountedTotal = baseTotal * (1 - totalDiscount / 100);
 
     const freeCasesTotal = Object.values(cartData)
-      .filter((item) => freeCases.includes(item.id))
+      .filter((item) => freeCasesList.includes(item.id))
       .reduce((sum, item) => sum + item.price, 0);
 
     setOldTotalPrice(baseTotal);
     setTotalPrice(discountedTotal - freeCasesTotal);
-  }, [userData, freeCases]);
+  };
 
   const handleQuantityChange = (id, type) => {
     const updatedCart = { ...cart };
@@ -232,19 +247,33 @@ export function CartPage() {
   };
 
   const handleFreeCaseChange = (id) => {
-    setFreeCases((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((item) => item !== id);
-      } else if (prev.length < (userData?.data.freeCases || 0)) {
-        return [...prev, id];
-      }
-      return prev;
-    });
+    setFreeCases((prev) =>
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : prev.length < (userData?.data?.freeCases || 0)
+        ? [...prev, id]
+        : prev
+    );
   };
 
-  const handleGoToOrder = () => {
-    navigate('/order');
+  const handleOrder = () => {
+    const orderItems = Object.values(cart).map((item) => ({
+      product: item.id,
+      quantity: item.quantity,
+      isFree: item.isCase && freeCases.includes(item.id),
+    }));
+
+    if (orderItems.length > 0) {
+      placeOrder(orderItems);
+    }
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      localStorage.removeItem('CARTStorage');
+      navigate('/order');
+    }
+  }, [isSuccess, navigate]);
 
   if (!isAuth) {
     return (
@@ -288,7 +317,7 @@ export function CartPage() {
                     {item.price} сом × {item.quantity}
                   </p>
                 </div>
-                {item.isCase && userData?.data.freeCases > 0 && (
+                {item.isCase && userData?.data?.freeCases > 0 && (
                   <Checkbox
                     checked={freeCases.includes(item.id)}
                     onChange={() => handleFreeCaseChange(item.id)}
@@ -298,14 +327,12 @@ export function CartPage() {
                 <div className="flex items-center gap-2">
                   <IconButton
                     onClick={() => handleQuantityChange(item.id, 'decrease')}
-                    aria-label="Decrease quantity"
                   >
                     <IndeterminateCheckBoxRoundedIcon className="text-gray-600" />
                   </IconButton>
                   <span className="font-bold">{item.quantity}</span>
                   <IconButton
                     onClick={() => handleQuantityChange(item.id, 'increase')}
-                    aria-label="Increase quantity"
                   >
                     <AddBoxIcon className="text-gray-600" />
                   </IconButton>
@@ -315,58 +342,55 @@ export function CartPage() {
             ))}
           </div>
 
-          <div className="flex justify-between">
-            <p className="mt-4 text-gray-600 text-lg font-medium flex items-center gap-2">
+          <div className="flex justify-between mt-6">
+            <p className="text-gray-600 text-lg font-medium flex items-center gap-2">
               🎁 Доступно бесплатных чехлов:
               <span className="text-violet font-bold">
-                {userData?.data.freeCases
+                {userData?.data?.freeCases
                   ? Math.max(userData.data.freeCases - freeCases.length, 0)
                   : 0}
               </span>
             </p>
+          </div>
 
-            <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
-              <p className="text-xl font-bold text-gray-800">
-                {oldTotalPrice > totalPrice && (
-                  <>
-                    <span className="line-through text-gray-500 mr-2">
-                      {oldTotalPrice.toFixed(2)} сом
-                    </span>
-                    <span className="text-violet">
-                      {totalPrice.toFixed(2)} сом
-                    </span>
-                  </>
-                )}
-                {oldTotalPrice === totalPrice && (
-                  <span className="text-violet">
-                    {totalPrice.toFixed(2)} сом
+          <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
+            <p className="text-xl font-bold text-gray-800">
+              {oldTotalPrice > totalPrice && (
+                <>
+                  <span className="line-through text-gray-500 mr-2">
+                    {oldTotalPrice.toFixed(2)} сом
                   </span>
-                )}
+                  <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
+                </>
+              )}
+              {oldTotalPrice === totalPrice && (
+                <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
+              )}
+            </p>
+            {userData?.data?.birthdayDiscount > 0 && (
+              <p className="text-sm text-violet text-end">
+                Скидка в честь дня рождения!
               </p>
-              {userData?.data.birthdayDiscount > 0 && (
+            )}
+            {userData?.data?.cluster === 'K4' &&
+              userData?.data?.welcomeDiscount > 0 && (
                 <p className="text-sm text-violet text-end">
-                  Скидка в честь дня рождения!
+                  Скидка в {userData.data.welcomeDiscount}%
                 </p>
               )}
-              {userData?.data.cluster === 'K4' &&
-                userData?.data.welcomeDiscount > 0 && (
-                  <p className="text-sm text-violet text-end">
-                    Скидка в {userData.data.welcomeDiscount}%
-                  </p>
-                )}
-            </div>
           </div>
 
           <Button
             variant="contained"
-            className="mt-4 bg-violet shadow-none text-white font-semibold px-6 py-3 rounded-lg  transition-all duration-300 hover:bg-violet-dark"
-            onClick={handleGoToOrder}
+            className="mt-4 bg-violet shadow-none text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:bg-violet-dark"
+            onClick={handleOrder}
             fullWidth
           >
-            Перейти к оформлению
+            {isPending ? <CircularProgress size={24} /> : 'Оформить заказ'}
           </Button>
         </>
       )}
     </div>
   );
 }
+ 

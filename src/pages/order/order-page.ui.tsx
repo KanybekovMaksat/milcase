@@ -8,7 +8,19 @@ import { useEffect } from 'react';
 
 export function OrderPage() {
   const isAuth = getCookie('access');
-  const { data: ordersData, isLoading, isError } = productQueries.useGetCart();
+const {
+  data: ordersData,
+  isLoading,
+  isError,
+  refetch // вот он
+} = productQueries.useGetCart();
+useEffect(() => {
+  const interval = setInterval(() => {
+    refetch();
+  }, 1000); // обновлять каждые 10 секунд
+
+  return () => clearInterval(interval);
+}, [refetch]);
 
   const {
     mutate: createPayment,
@@ -28,6 +40,7 @@ export function OrderPage() {
       </div>
     );
   }
+
 
   if (isError) {
     return (
@@ -52,25 +65,6 @@ export function OrderPage() {
       </div>
     );
   }
-  useEffect(() => {
-    if (!ordersData?.data.length) {
-      const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
-      const orderItems = Object.values(cartData).map((item) => ({
-        product: item.id,
-        quantity: item.quantity,
-        isFree: item.isCase || false,
-      }));
-
-      if (orderItems.length > 0) {
-        productQueries.useCreateOrder().mutate(orderItems, {
-          onSuccess: () => {
-            localStorage.removeItem('CARTStorage');
-            // Перезапросить данные заказов
-          },
-        });
-      }
-    }
-  }, [ordersData]);
 
   const latestOrder = ordersData?.data.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
