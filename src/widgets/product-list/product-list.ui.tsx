@@ -34,11 +34,12 @@ export const ProductList = () => {
 
   return (
     <div className="w-full px-4 py-8 flex flex-col">
-      <div className="w-full flex flex-wrap justify-between">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {productData.data.results.slice(0, 8).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+
       <Link
         to={pathKeys.catalog()}
         className="underline text-violet font-semibold text-end mt-4"

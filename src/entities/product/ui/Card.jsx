@@ -1,4 +1,3 @@
-import React from 'react';
 import { FavoriteButton } from '~features/product-card/favorite-button';
 import { CartButton } from './../../../features/product-card/cart-button/cart-button.ui';
 
@@ -9,7 +8,11 @@ const ProductCard = ({ product }) => {
       className="relative w-full flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow md:w-64 h-70"
     >
       <img
-        src={product.photo}
+        src={
+          product.photo?.startsWith('http')
+            ? product.photo
+            : `http://milcase.makalabox.com${product.photo || ''}`
+        }
         alt={product.name}
         className="w-full h-40 object-cover"
       />

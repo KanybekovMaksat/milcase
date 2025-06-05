@@ -173,16 +173,13 @@
 // }
 
 import { useState, useEffect } from 'react';
-import { CircularProgress, Button, Checkbox } from '@mui/material';
+import { CircularProgress, Button, Checkbox, IconButton } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCookie } from 'typescript-cookie';
 import { Title } from '~shared/ui/title';
-import { IconButton } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
-import { productQueries } from '~entities/product';
 import { userQueries } from '~entities/user';
-import { WelcomeDiscount } from '~widgets/welcome-discount';
 
 export function CartPage() {
   const isAuth = getCookie('access');
@@ -190,14 +187,8 @@ export function CartPage() {
   const [totalPrice, setTotalPrice] = useState(0);
   const [oldTotalPrice, setOldTotalPrice] = useState(0);
   const [freeCases, setFreeCases] = useState([]);
-  const {
-    mutate: placeOrder,
-    isPending,
-    isSuccess,
-  } = productQueries.useCreateOrder();
   const { data: userData } = userQueries.useLoginUserQuery();
   const navigate = useNavigate();
-  const showBanner = userData?.data?.cluster === 'K4';
 
   useEffect(() => {
     const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
@@ -212,7 +203,6 @@ export function CartPage() {
     const welcomeDiscount =
       userData?.data.cluster === 'K4' ? userData?.data.welcomeDiscount || 0 : 0;
 
-    // Суммарная скидка, но максимум 100% не допускаем
     const totalDiscount = Math.min(birthdayDiscount + welcomeDiscount, 100);
 
     const discountedTotal = baseTotal * (1 - totalDiscount / 100);
@@ -252,34 +242,19 @@ export function CartPage() {
     });
   };
 
-  const handleOrder = () => {
-    const orderItems = Object.values(cart).map((item) => ({
-      product: item.id,
-      quantity: item.quantity,
-      isFree: item.isCase && freeCases.includes(item.id),
-    }));
-
-    if (orderItems.length > 0) {
-      placeOrder(orderItems);
-    }
+  const handleGoToOrder = () => {
+    navigate('/order');
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      localStorage.removeItem('CARTStorage');
-      navigate('/order');
-    }
-  }, [isSuccess, navigate]);
 
   if (!isAuth) {
     return (
       <div className="text-center text-gray-600">
-        <p className="mb-4">Необходима авторизация.</p>
+        <p className="mb-4">Необходима войти в систему.</p>
         <Link
           to="/login"
           className="bg-milk text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
         >
-          авторизация
+          Войти
         </Link>
       </div>
     );
@@ -299,7 +274,11 @@ export function CartPage() {
                 className="flex items-center justify-between p-4 border border-[gray] rounded-lg shadow-sm"
               >
                 <img
-                  src={item.photo}
+                  src={
+                    item.photo.startsWith('http')
+                      ? item.photo
+                      : `http://milcase.makalabox.com${item.photo}`
+                  }
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded-lg"
                 />
@@ -335,10 +314,11 @@ export function CartPage() {
               </div>
             ))}
           </div>
+
           <div className="flex justify-between">
             <p className="mt-4 text-gray-600 text-lg font-medium flex items-center gap-2">
               🎁 Доступно бесплатных чехлов:
-              <span className="text-violet font-bold ">
+              <span className="text-violet font-bold">
                 {userData?.data.freeCases
                   ? Math.max(userData.data.freeCases - freeCases.length, 0)
                   : 0}
@@ -357,33 +337,33 @@ export function CartPage() {
                     </span>
                   </>
                 )}
-                {userData?.data.birthdayDiscount > 0 && (
-                  <p className="text-sm text-violet text-end">
-                    Скидка в честь дня рождения!
-                  </p>
-                )}
-                {userData.data.cluster === 'K4' &&
-                  userData?.data.welcomeDiscount > 0 &&
-                  userData?.data.cluster === 'K4' && (
-                    <p className="text-sm text-violet text-end">
-                      Скидка в {userData.data.welcomeDiscount}%
-                    </p>
-                  )}
                 {oldTotalPrice === totalPrice && (
                   <span className="text-violet">
                     {totalPrice.toFixed(2)} сом
                   </span>
                 )}
               </p>
+              {userData?.data.birthdayDiscount > 0 && (
+                <p className="text-sm text-violet text-end">
+                  Скидка в честь дня рождения!
+                </p>
+              )}
+              {userData?.data.cluster === 'K4' &&
+                userData?.data.welcomeDiscount > 0 && (
+                  <p className="text-sm text-violet text-end">
+                    Скидка в {userData.data.welcomeDiscount}%
+                  </p>
+                )}
             </div>
           </div>
+
           <Button
             variant="contained"
             className="mt-4 bg-violet shadow-none text-white font-semibold px-6 py-3 rounded-lg  transition-all duration-300 hover:bg-violet-dark"
-            onClick={handleOrder}
+            onClick={handleGoToOrder}
             fullWidth
           >
-            {isPending ? <CircularProgress size={24} /> : 'Оформить заказ'}
+            Перейти к оформлению
           </Button>
         </>
       )}

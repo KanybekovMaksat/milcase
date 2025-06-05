@@ -4,19 +4,27 @@ import { getCookie } from 'typescript-cookie';
 import { Title } from '~shared/ui/title';
 import { productQueries } from '~entities/product';
 import { userQueries } from '~entities/user';
-
+import { useEffect } from 'react';
 
 export function OrderPage() {
   const isAuth = getCookie('access');
   const { data: ordersData, isLoading, isError } = productQueries.useGetCart();
 
-  const { mutate: createPayment, isPending, isSuccess, isError: isPaymentError, data: paymentData } = productQueries.useCreatePayment();
+  const {
+    mutate: createPayment,
+    isPending,
+    isSuccess,
+    isError: isPaymentError,
+    data: paymentData,
+  } = productQueries.useCreatePayment();
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center gap-4">
         <CircularProgress className="text-milk w-10 h-10" />
-        <h3 className="text-milk font-semibold text-lg opacity-75">Загружаем данные...</h3>
+        <h3 className="text-milk font-semibold text-lg opacity-75">
+          Загружаем данные...
+        </h3>
       </div>
     );
   }
@@ -24,7 +32,9 @@ export function OrderPage() {
   if (isError) {
     return (
       <div className="flex flex-col items-center gap-4">
-        <h3 className="text-milk font-semibold text-lg opacity-75">Произошла ошибка при загрузке данных!</h3>
+        <h3 className="text-milk font-semibold text-lg opacity-75">
+          Произошла ошибка при загрузке данных!
+        </h3>
       </div>
     );
   }
@@ -42,6 +52,25 @@ export function OrderPage() {
       </div>
     );
   }
+  useEffect(() => {
+    if (!ordersData?.data.length) {
+      const cartData = JSON.parse(localStorage.getItem('CARTStorage')) || {};
+      const orderItems = Object.values(cartData).map((item) => ({
+        product: item.id,
+        quantity: item.quantity,
+        isFree: item.isCase || false,
+      }));
+
+      if (orderItems.length > 0) {
+        productQueries.useCreateOrder().mutate(orderItems, {
+          onSuccess: () => {
+            localStorage.removeItem('CARTStorage');
+            // Перезапросить данные заказов
+          },
+        });
+      }
+    }
+  }, [ordersData]);
 
   const latestOrder = ordersData?.data.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -62,20 +91,28 @@ export function OrderPage() {
   };
 
   if (isSuccess && paymentData?.data.checkoutUrl) {
-    window.location.href = paymentData.data.checkoutUrl; 
-    return null; 
+    window.location.href = paymentData.data.checkoutUrl;
+    return null;
   }
 
   return (
     <div className="min-h-screen w-full p-6 bg-white rounded-lg shadow-xl max-w-lg mx-auto my-20 border border-[gray]/50">
       <div className="flex flex-col items-center border-b border-gray-300 pb-4">
         <Title>Заказ #{id}</Title>
-        <img src="/logo.png" alt="Logo" className="w-24 h-24 mt-4 rounded-full" />
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-24 h-24 mt-4 rounded-full"
+        />
       </div>
 
       <div className="mt-4 border-b border-gray-300 pb-4">
-        <p className="text-lg font-semibold">Статус заказа: <span className="text-violet">{status}</span></p>
-        <p className="text-lg font-semibold">Общая сумма: <span className="text-violet">{totalPrice} сом</span></p>
+        <p className="text-lg font-semibold">
+          Статус заказа: <span className="text-violet">{status}</span>
+        </p>
+        <p className="text-lg font-semibold">
+          Общая сумма: <span className="text-violet">{totalPrice} сом</span>
+        </p>
         <p className="text-sm text-gray-500">
           Дата создания: {new Date(createdAt).toLocaleString()}
         </p>
@@ -85,7 +122,10 @@ export function OrderPage() {
         <h4 className="text-md font-semibold">Товары в заказе:</h4>
         <ul className="list-none mt-2">
           {orderItems.map((item, index) => (
-            <li key={index} className="flex justify-between py-2 border-b border-gray-200">
+            <li
+              key={index}
+              className="flex justify-between py-2 border-b border-gray-200"
+            >
               <span>{`Товар: ${item.product.name}`}</span>
               <span>{`Количество: ${item.quantity}`}</span>
             </li>
@@ -117,9 +157,13 @@ export function OrderPage() {
             className="mt-4 bg-violet shadow-none"
             fullWidth
             onClick={handlePayment}
-            disabled={isPending} 
+            disabled={isPending}
           >
-            {isPending ? <CircularProgress size={24} color="inherit" /> : 'Оплатить заказ'}
+            {isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              'Оплатить заказ'
+            )}
           </Button>
         )}
         {isPaid && (
@@ -128,7 +172,9 @@ export function OrderPage() {
           </p>
         )}
         {isPaymentError && !isPaid && (
-          <p className="mt-4 text-red-500 font-semibold">Ошибка при оплате, попробуйте снова.</p>
+          <p className="mt-4 text-red-500 font-semibold">
+            Ошибка при оплате, попробуйте снова.
+          </p>
         )}
       </div>
 

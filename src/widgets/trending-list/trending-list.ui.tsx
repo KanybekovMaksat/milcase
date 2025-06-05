@@ -68,7 +68,7 @@ export const TrendingList = () => {
             }}
             className=" pb-[40px]"
           >
-            {recommendedProducts?.data?.results?.map((product) => (
+            {recommendedProducts?.data?.map((product) => (
               <SwiperSlide key={product.id} className="pt-[20px]">
                 <ProductCard key={product.id} product={product} />
               </SwiperSlide>

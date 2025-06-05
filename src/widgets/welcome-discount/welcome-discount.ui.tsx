@@ -5,6 +5,7 @@ import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 
 export const WelcomeDiscount = ({discount}) => {
   return (
+    <div className='w-full px-4'>
     <div className="w-full rounded-xl bg-gradient-to-r from-violet to-milk p-6">
       <div className="w-full mx-auto">
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden">
@@ -28,6 +29,7 @@ export const WelcomeDiscount = ({discount}) => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
