@@ -8,19 +8,19 @@ import { useEffect } from 'react';
 
 export function OrderPage() {
   const isAuth = getCookie('access');
-const {
-  data: ordersData,
-  isLoading,
-  isError,
-  refetch // вот он
-} = productQueries.useGetCart();
-useEffect(() => {
-  const interval = setInterval(() => {
-    refetch();
-  }, 1000); // обновлять каждые 10 секунд
+  const {
+    data: ordersData,
+    isLoading,
+    isError,
+    refetch,
+  } = productQueries.useGetCart();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 1000);
 
-  return () => clearInterval(interval);
-}, [refetch]);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const {
     mutate: createPayment,
@@ -40,7 +40,6 @@ useEffect(() => {
       </div>
     );
   }
-
 
   if (isError) {
     return (
@@ -78,7 +77,17 @@ useEffect(() => {
     );
   }
 
-  const { id, totalPrice, isPaid, status, orderItems, createdAt } = latestOrder;
+  const {
+    id,
+    totalPrice,
+    isPaid,
+    status,
+    orderItems,
+    createdAt,
+    city,
+    address,
+    phoneNumber,
+  } = latestOrder;
 
   const handlePayment = () => {
     createPayment(id);
@@ -110,6 +119,17 @@ useEffect(() => {
         <p className="text-sm text-gray-500">
           Дата создания: {new Date(createdAt).toLocaleString()}
         </p>
+        {/* <div className="mt-4  border-gray-300 text-sm text-gray-700">
+          <p>
+            <span className="font-semibold">Город доставки:</span> {city}
+          </p>
+          <p>
+            <span className="font-semibold">Адрес:</span> {address}
+          </p>
+          <p>
+            <span className="font-semibold">Телефон:</span> {phoneNumber}
+          </p>
+        </div> */}
       </div>
 
       <div className="mt-6">

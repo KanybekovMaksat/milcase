@@ -188,6 +188,9 @@ export function CartPage() {
   const [totalPrice, setTotalPrice] = useState(0);
   const [oldTotalPrice, setOldTotalPrice] = useState(0);
   const [freeCases, setFreeCases] = useState([]);
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const {
     mutate: placeOrder,
@@ -263,8 +266,10 @@ export function CartPage() {
       isFree: item.isCase && freeCases.includes(item.id),
     }));
 
-    if (orderItems.length > 0) {
-      placeOrder(orderItems);
+    if (orderItems.length > 0 && city && address && phoneNumber) {
+      placeOrder({ orderItems, city, address, phoneNumber });
+    } else {
+      alert('Пожалуйста, заполните все поля доставки');
     }
   };
 
@@ -341,6 +346,32 @@ export function CartPage() {
               </div>
             ))}
           </div>
+          <div className="mt-6 grid gap-4">
+            <input
+              type="text"
+              required
+              placeholder="Город"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="p-3 border rounded-md w-full"
+            />
+            <input
+              type="text"
+              required
+              placeholder="Адрес доставки"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="p-3 border rounded-md w-full"
+            />
+            <input
+              type="tel"
+              required
+              placeholder="Номер телефона"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="p-3 border rounded-md w-full"
+            />
+          </div>
 
           <div className="flex justify-between mt-6">
             <p className="text-gray-600 text-lg font-medium flex items-center gap-2">
@@ -352,7 +383,6 @@ export function CartPage() {
               </span>
             </p>
           </div>
-
           <div className="mt-6 flex flex-col items-end self-end rounded-lg w-full max-w-sm">
             <p className="text-xl font-bold text-gray-800">
               {oldTotalPrice > totalPrice && (
@@ -360,7 +390,9 @@ export function CartPage() {
                   <span className="line-through text-gray-500 mr-2">
                     {oldTotalPrice.toFixed(2)} сом
                   </span>
-                  <span className="text-violet">{totalPrice.toFixed(2)} сом</span>
+                  <span className="text-violet">
+                    {totalPrice.toFixed(2)} сом
+                  </span>
                 </>
               )}
               {oldTotalPrice === totalPrice && (
@@ -393,4 +425,3 @@ export function CartPage() {
     </div>
   );
 }
- 

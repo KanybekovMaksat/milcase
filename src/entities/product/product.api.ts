@@ -24,9 +24,14 @@ export function getCategories() {
 }
 
 export function createOrder(
-  orderItems: { product: number; quantity: number }[]
+  orderData: {
+    orderItems: { product: number; quantity: number; isFree?: boolean }[];
+    city: string;
+    address: string;
+    phoneNumber: string;
+  }
 ) {
-  return $api.post(`orders/me/`, { orderItems });
+  return $api.post(`orders/me/`, orderData);
 }
 
 export function getCartInfo() {
